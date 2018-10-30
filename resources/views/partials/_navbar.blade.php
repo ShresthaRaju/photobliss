@@ -2,7 +2,7 @@
     <div class="container">
         {{-- when a user is not authenticated --}}
         @guest
-        <a class="navbar-brand font-weight-bold" href="{{ url('/') }}">
+        <a class="navbar-brand font-weight-bold" href="{{ route('welcome') }}">
             PhotoBliss
         </a>
         <ul class="navbar-nav">
@@ -15,7 +15,7 @@
         @else
         {{-- when a user is authenticated --}}
         <div class="navbar-translate">
-            <a class="navbar-brand font-weight-bold" href="#">
+            <a class="navbar-brand font-weight-bold" href="{{ route('welcome') }}">
                 PhotoBliss
             </a>
             <button aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-toggle="collapse" type="button">
@@ -49,7 +49,7 @@
                         Welcome, {{Auth::user()->username}}
                     </a>
                     <div aria-labelledby="navigationOptions" class="dropdown-menu dropdown-menu-right dropdown-with-icons">
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="{{ route('photo.submit') }}">
                             <i class="material-icons">
                                 add_a_photo
                             </i>

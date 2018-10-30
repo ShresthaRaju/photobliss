@@ -6,3 +6,4 @@
 	<sign-up></sign-up>
 </div>
 @endsection
+

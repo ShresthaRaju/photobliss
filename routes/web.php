@@ -13,7 +13,6 @@
 
 // landing page
 Route::view('/', 'welcome')->name('welcome');
-Route::redirect('home', '/');
 
 // authentication
 Route::get('sign-up', 'Auth\SignUpController@showSignUpForm');
@@ -21,3 +20,11 @@ Route::post('sign-up', 'Auth\SignUpController@registerUser');
 Route::get('sign-in', 'Auth\SignInController@showSignInForm')->name('signIn');
 Route::post('sign-in', 'Auth\SignInController@signIn');
 Route::post('sign-out', 'Auth\SignInController@signOut')->name('signOut');
+
+//photos
+Route::group(['prefix' => 'photo', 'as' => 'photo.'], function () {
+    Route::get('submit', ['as' => 'submit', 'uses' => 'PhotosController@create']);
+    Route::post('get-details',['as'=>'getDetails','uses'=>'PhotosController@getPhotoDetails']);
+});
+
+Route::get('details','PhotosController@det');
