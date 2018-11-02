@@ -1,4 +1,4 @@
-<nav class="navbar fixed-top navbar-expand-lg navbar-transparent bg-dark navbar-color-on-scroll" color-on-scroll="300">
+<nav class="navbar fixed-top navbar-expand-lg navbar-transparent bg-dark navbar-color-on-scroll" color-on-scroll="300" style="z-index: 800;">
     <div class="container">
         {{-- when a user is not authenticated --}}
         @guest

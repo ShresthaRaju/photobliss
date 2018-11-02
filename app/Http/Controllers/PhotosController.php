@@ -117,21 +117,14 @@ class PhotosController extends Controller
             $photo_details['model']         = Arr::exists($exif, 'Model') ? $exif['Model'] : '';
             $photo_details['focal_length']  = $focal_length;
             $photo_details['aperture']      = $aperture;
-            $photo_details['shutter_speed'] = Arr::exists($exif, 'ExposureTime') ? $exif['ExposureTime'] : '';
+            $photo_details['exposure_time'] = Arr::exists($exif, 'ExposureTime') ? $exif['ExposureTime'] : '';
             $photo_details['iso']           = Arr::exists($exif, 'ISOSpeedRatings') ? $exif['ISOSpeedRatings'] : '';
 
             return response()->json($photo_details);
         }
     }
 
-    public function det($value = '')
-    {
-        $exif = exif_read_data(public_path('images/6.jpg'));
-        dump($exif);
-        dd($exif['COMPUTED']['Height']);
-    }
-
-    // convert the string version of FocalLength to float
+    // convert the string version of exif_attribute to float
     private function convert($exif_attribute)
     {
         $splitted = explode("/", $exif_attribute);

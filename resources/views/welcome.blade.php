@@ -9,12 +9,7 @@
 				<h1 class="title">PhotoBliss</h1>
 				<p class="h4 mt-0">Beautiful, free photos.</p>
 				<p class="h4">Gifted by the world’s most generous community of photographers.</p>
-				<div class="input-group has-warning mt-5">
-					<div class="input-group-prepend">
-						<button class="btn btn-raised btn-danger btn-sm btn-round mr-1">
-						<i class="material-icons">search</i>
-						</button>
-					</div>
+				<div class="form-group has-warning mt-5">
 					<input type="text" class="form-control text-white" placeholder="Search free high-resolution photos...">
 				</div>
 			</div>

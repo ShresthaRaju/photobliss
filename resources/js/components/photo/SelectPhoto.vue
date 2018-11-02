@@ -17,7 +17,9 @@
                   Add a photo
               </button>
           </div>
-        <!-- <vue-loader :isLoading="isLoading"></vue-loader> -->
+
+        <vue-loader :isLoading="isLoading"></vue-loader>
+        
       </div>
       </div>
     </div>
@@ -35,10 +37,7 @@ export default {
 
   data () {
     return {
-      photo:{
-        selected:'',
-        details:[]
-      },
+      photo:{},
       isLoading:false
     }
   },
@@ -49,24 +48,17 @@ export default {
   	},
 
   	onPhotoSelected(){
-  		this.photo.selected=this.$refs.selectPhoto.files[0];
 
-      var formData=new FormData();
-      formData.append('selected_photo',this.photo.selected);
+  		this.photo=this.$refs.selectPhoto.files[0];
 
-      axios.post('/photo/get-details',formData)
-      .then(response => {
-        this.photo.details=response.data;
-        this.$emit('photoSelected',this.photo);
-        // this.isLoading=true;
-        // setTimeout(() => {
-        //   this.isLoading=false;
-        //   this.$emit('photoSelected',this.photo);
-        // }, 4000);
-        
-      })
-      .catch(errors => console.log(errors.response.data.errors))
+      this.isLoading=true;
+
+      this.$store.dispatch('getPhotoDetails',this.photo).then(response => {
+        // console.log(response);
+        this.isLoading=false;
+        this.$emit('photoSelected');
+      });
   	}
-  }
+  },
 }
 </script>

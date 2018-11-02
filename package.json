@@ -23,6 +23,8 @@
         "material-kit": "^2.0.4",
         "moment": "^2.22.2",
         "vue-loading-overlay": "^3.0.1",
-        "vue-toasted": "^1.1.25"
+        "vue-toasted": "^1.1.25",
+        "vue2-google-maps": "^0.10.2",
+        "vuex": "^3.0.1"
     }
 }

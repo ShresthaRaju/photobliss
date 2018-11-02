@@ -8,4 +8,4 @@
 <!-- css -->
 <link rel="stylesheet" type="text/css" href="{{asset('css/app.css')}}">
 <!-- custom stylesheets -->
-@yield('custom_stylesheet')
+@yield('custom_stylesheets')

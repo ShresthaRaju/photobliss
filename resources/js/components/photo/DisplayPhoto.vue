@@ -1,7 +1,7 @@
 <template>
-	<div :class="['full-page-photo',{'active':hasPhoto}]" :style="{backgroundImage:'url('+photo+')'}">
+	<div :class="['full-page-photo',{'active':hasPhoto}]" :style="{backgroundImage:'url('+image+')'}">
 		<div class="photo-overlay" v-show="hasPhoto"></div>
-		<div class="container mt-15 add-details">
+		<div class="container mt-9 add-details">
 			<add-details></add-details>
 		</div>
 	</div>
@@ -13,8 +13,6 @@ import AddDetails from './AddDetails.vue';
 
 export default {
 
-	props:['photoUrl'],
-
 	components:{
 		'add-details':AddDetails,
 	},
@@ -22,15 +20,20 @@ export default {
   data () {
     return {
     	hasPhoto:false,
-    	photo:''
-
     }
   },
 
+  computed:{
+  	image(){
+  		return URL.createObjectURL(this.$store.state.photo.photo);
+  	}
+  },
+
   mounted(){
-  	this.photo=URL.createObjectURL(this.photoUrl);
+  	this.image;
   	this.hasPhoto=true;
   },
+
 }
 </script>
 
@@ -43,7 +46,7 @@ export default {
 	}
 
 	.full-page-photo.active{
-		z-index:1050;
+		z-index:900;
 	}
 
 	.photo-overlay{
@@ -56,7 +59,7 @@ export default {
 	}
 
 	.active .photo-overlay{
-		opacity: 0.8;
+		opacity: 1;
 	}
 
 	.add-details{

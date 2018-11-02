@@ -15,6 +15,18 @@ window.Vue = require('vue');
 import Toasted from 'vue-toasted';
 Vue.use(Toasted);
 
+//vue google maps
+import * as VueGoogleMaps from 'vue2-google-maps'
+Vue.use(VueGoogleMaps,{
+	load: {
+	    key: 'AIzaSyBhztCK9gFVGR9tIHxbRgRC3ui8miMZ13M',
+	    libraries: 'places',
+	}
+});
+
+// vuex central store
+import {centralStore} from './vuex/centralStore';
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -24,8 +36,8 @@ Vue.use(Toasted);
 Vue.component('sign-in', require('./components/auth/SignIn.vue'));
 Vue.component('sign-up', require('./components/auth/SignUp.vue'));
 Vue.component('submit-photo', require('./components/photo/SubmitPhoto.vue'));
-Vue.component('display-photo', require('./components/photo/DisplayPhoto.vue'));
 
 const app = new Vue({
+	store:centralStore,
     el: '#app'
 });

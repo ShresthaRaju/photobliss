@@ -1,5 +1,5 @@
 <template>
-	<component :is="activeComponent" @photoSelected="displayPhoto($event)" :photoUrl="photoUrl"></component>
+		<component :is="activeComponent" @photoSelected="changeComponent"></component>
 </template>
 
 <script>
@@ -18,15 +18,13 @@
 	  data () {
 	    return {
 	    	activeComponent:'select-photo',
-	    	photoUrl:'',
 	    }
 	  },
 
 	  methods:{
-	  	displayPhoto(photo){
-	  		this.photoUrl=photo.selected;
-	  		this.activeComponent='display-photo'
+	  	changeComponent(){
+		  	this.activeComponent='display-photo';
 	  	}
-	  }
+	  },
 	}
 </script>
