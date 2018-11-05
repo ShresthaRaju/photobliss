@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html style="height: 100%">
 	<head>
 		@include('partials._header')
 	</head>
-	<body class="@yield('body_class')">
+	<body class="@yield('body_class')" style="height: 100%">
 		{{-- navigation bar --}}
 		@include('partials._navbar')
 

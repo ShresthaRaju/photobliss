@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Photo;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 
 class PhotosController extends Controller
 {
+    private $folder_path;
 
     public function __construct()
     {
         $this->middleware('auth')->except(['index', 'show']);
+
+        $this->folder_path = public_path() . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
+
     }
 
     /**
@@ -39,9 +46,53 @@ class PhotosController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function uploadPhoto(Request $request)
     {
-        //
+        //since the details have been json encoded while sending we need to decode here
+        $photo_details = json_decode($request->details);
+
+        if ($request->hasFile('photo')) {
+            $photoFile  = $request->file('photo');
+            $photo_name = time() . '_' . $photoFile->getClientOriginalName();
+
+            // persist the photo details to database
+            $photo                = new Photo();
+            $photo->photo_name    = $photo_name;
+            $photo->title         = $photo_details->title;
+            $photo->story         = $photo_details->story;
+            $photo->make          = $photo_details->make;
+            $photo->model         = $photo_details->model;
+            $photo->aperture      = $photo_details->aperture;
+            $photo->exposure_time = $photo_details->exposure_time;
+            $photo->focal_length  = $photo_details->focal_length;
+            $photo->iso           = $photo_details->iso;
+            $photo->location      = $photo_details->location;
+            $photo->user_id       = Auth::id();
+
+            if ($photo->save()) {
+                foreach ($photo_details->tags as $pTag) {
+                    $tag = Tag::firstOrCreate(['name' => $pTag]);
+                    $photo->tags()->attach($tag);
+                }
+
+                // move the photo to public folder
+                // check if folder already exists
+                if (file_exists($this->folder_path . Auth::user()->username)) {
+                    $this->move_photo($photoFile, $photo_name, Auth::user()->username);
+                } else {
+                    mkdir($this->folder_path . Auth::user()->username);
+                    $this->move_photo($photoFile, $photo_name, Auth::user()->username);
+                }
+
+                return response()->json("Upload Successful");
+            }
+        }
+    }
+
+    // move the uploaded photo to specified path
+    private function move_photo($photoFile, $photo_name, $directory_name)
+    {
+        $photoFile->move(public_path() . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . $directory_name, $photo_name);
     }
 
     /**
@@ -89,10 +140,11 @@ class PhotosController extends Controller
         //
     }
 
-    //get the details of the selected photo and return response
+    //get the details of the selected photo and return as response
     public function getPhotoDetails(Request $request)
     {
         if ($request->hasFile('selected_photo')) {
+
             $photo      = $request->file('selected_photo');
             $photo_name = $photo->getClientOriginalName();
             $exif       = exif_read_data($photo);
@@ -129,5 +181,11 @@ class PhotosController extends Controller
     {
         $splitted = explode("/", $exif_attribute);
         return $splitted[0] / $splitted[1];
+    }
+
+    public function det()
+    {
+        $exif = exif_read_data(public_path('images/autumn.jpg'));
+        dd(Arr::exists($exif, 'FocalLength'));
     }
 }

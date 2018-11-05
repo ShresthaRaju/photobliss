@@ -24,7 +24,11 @@ Route::post('sign-out', 'Auth\SignInController@signOut')->name('signOut');
 //photos
 Route::group(['prefix' => 'photo', 'as' => 'photo.'], function () {
     Route::get('submit', ['as' => 'submit', 'uses' => 'PhotosController@create']);
-    Route::post('get-details',['as'=>'getDetails','uses'=>'PhotosController@getPhotoDetails']);
+    Route::post('get-details', ['as' => 'getDetails', 'uses' => 'PhotosController@getPhotoDetails']);
+    Route::post('upload', ['as' => 'upload', 'uses' => 'PhotosController@uploadPhoto']);
 });
 
-Route::get('details','PhotosController@det');
+//tags
+Route::get('tags', 'TagsController@getAllTags');
+
+Route::get('details', 'PhotosController@det');

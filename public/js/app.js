@@ -46339,41 +46339,75 @@ if (false) {
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */]);
 
 var centralStore = new __WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */].Store({
-	state: {
-		photo: {
-			photo: {},
-			details: {}
-		}
-	},
+    state: {
+        selectedPhoto: {},
+        photoToUpload: {}
+    },
 
-	mutations: {
-		storePhoto: function storePhoto(state, photo) {
-			state.photo = photo;
-		}
-	},
+    mutations: {
+        storeSelectedPhoto: function storeSelectedPhoto(state, selectedPhoto) {
+            state.selectedPhoto = selectedPhoto;
+        },
+        storePhotoToUpload: function storePhotoToUpload(state, payload) {
+            state.photoToUpload[payload.key] = payload.value;
+        }
+    },
 
-	actions: {
-		getPhotoDetails: function getPhotoDetails(_ref, photo) {
-			var dispatch = _ref.dispatch;
-			//parameter {dispatch} is given so that we can call an action inside another action
-			return new Promise(function (resolve, reject) {
-				var formData = new FormData();
-				formData.append('selected_photo', photo);
+    actions: {
+        // pull the details of the photo selected by user to upload
+        getPhotoDetails: function getPhotoDetails(_ref, selectedPhoto) {
+            var dispatch = _ref.dispatch;
+            //parameter {dispatch} is given so that we can call an action inside another action
+            return new Promise(function (resolve, reject) {
+                var formData = new FormData();
+                formData.append('selected_photo', selectedPhoto);
 
-				axios.post('/photo/get-details', formData).then(function (response) {
-					dispatch('setPhoto', { photo: photo, details: response.data });
-					resolve("completed");
-					// resolve('completed') is received as a response by the dispatcher.
-					// in this case the dispatcher is SelectPhoto.vue
-				}).catch(function (errors) {
-					return console.log(errors.response.data);
-				});
-			});
-		},
-		setPhoto: function setPhoto(context, photo) {
-			context.commit('storePhoto', photo);
-		}
-	}
+                axios.post('/photo/get-details', formData).then(function (response) {
+                    dispatch('setPhotoDetails', { photo: selectedPhoto, details: response.data });
+                    resolve("completed");
+                    // resolve('completed') is received as a response by the dispatcher.
+                    // in this case the dispatcher is SelectPhoto.vue
+                }).catch(function (errors) {
+                    return console.log(errors.response.data);
+                });
+            });
+        },
+
+
+        // set the extracted details of the selected photo in the store
+        setPhotoDetails: function setPhotoDetails(context, payload) {
+            //can be given any parameter name, not necessarily payload
+            context.commit('storeSelectedPhoto', payload);
+        },
+
+
+        // set extra details like exif, story, tags and location(entered by user) of the photo to upload
+        setUploadPhotoDetails: function setUploadPhotoDetails(_ref2, payload) {
+            var commit = _ref2.commit;
+
+            commit('storePhotoToUpload', payload);
+        },
+        mergeAllDetails: function mergeAllDetails(context) {
+            return new Promise(function (resolve, reject) {
+                var properties = context.state.photoToUpload;
+
+                var photo = {
+                    'title': properties.story.title,
+                    'story': properties.story.story,
+                    'make': properties.exif.make,
+                    'model': properties.exif.model,
+                    'aperture': properties.exif.aperture,
+                    'exposure_time': properties.exif.exposure_time,
+                    'focal_length': properties.exif.focal_length,
+                    'iso': properties.exif.iso,
+                    'tags': properties.tags,
+                    'location': properties.location
+                };
+
+                resolve(photo);
+            });
+        }
+    }
 });
 
 /***/ }),
@@ -47423,14 +47457,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
@@ -47443,7 +47469,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         };
     },
 
-
     methods: {
         signIn: function signIn() {
             var _this = this;
@@ -47455,7 +47480,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     _this.user = "";
                     _this.errors = "";
                 } else {
-                    _this.errors = { invalidLogin: "Invalid Login! Please try again" };
+                    _this.errors = {
+                        invalidLogin: "Invalid Login! Please try again"
+                    };
                 }
             }).catch(function (errors) {
                 _this.errors = errors.response.data.errors;
@@ -47587,8 +47614,16 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "card-header card-header-info" }, [
-      _c("h3", { staticClass: "card-title text-center" }, [
-        _vm._v("\n                    Sign In\n                    ")
+      _c("h3", { staticClass: "card-title text-center" }, [_vm._v("Sign In")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "input-group-prepend" }, [
+      _c("span", { staticClass: "input-group-text" }, [
+        _c("i", { staticClass: "material-icons" }, [_vm._v("mail")])
       ])
     ])
   },
@@ -47598,25 +47633,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "input-group-prepend" }, [
       _c("span", { staticClass: "input-group-text" }, [
-        _c("i", { staticClass: "material-icons" }, [
-          _vm._v(
-            "\n                                mail\n                                "
-          )
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "input-group-prepend" }, [
-      _c("span", { staticClass: "input-group-text" }, [
-        _c("i", { staticClass: "material-icons" }, [
-          _vm._v(
-            "\n                                lock_outline\n                                "
-          )
-        ])
+        _c("i", { staticClass: "material-icons" }, [_vm._v("lock_outline")])
       ])
     ])
   },
@@ -47788,16 +47805,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
@@ -47817,7 +47824,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var _this = this;
 
             axios.post('sign-up', this.user).then(function (response) {
-                console.log(response);
                 _this.user = "";
                 _this.formErrors = "";
                 // vue-toasted
@@ -48024,10 +48030,16 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "card-header card-header-primary" }, [
-      _c("h3", { staticClass: "card-title text-center" }, [
-        _vm._v(
-          "\r\n                        Sign Up\r\n                        "
-        )
+      _c("h3", { staticClass: "card-title text-center" }, [_vm._v("Sign Up")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "input-group-prepend" }, [
+      _c("span", { staticClass: "input-group-text" }, [
+        _c("i", { staticClass: "material-icons" }, [_vm._v("face")])
       ])
     ])
   },
@@ -48037,11 +48049,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "input-group-prepend" }, [
       _c("span", { staticClass: "input-group-text" }, [
-        _c("i", { staticClass: "material-icons" }, [
-          _vm._v(
-            "\r\n                                    face\r\n                                    "
-          )
-        ])
+        _c("i", { staticClass: "material-icons" }, [_vm._v("mail")])
       ])
     ])
   },
@@ -48051,11 +48059,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "input-group-prepend" }, [
       _c("span", { staticClass: "input-group-text" }, [
-        _c("i", { staticClass: "material-icons" }, [
-          _vm._v(
-            "\r\n                                    mail\r\n                                    "
-          )
-        ])
+        _c("i", { staticClass: "material-icons" }, [_vm._v("person")])
       ])
     ])
   },
@@ -48065,25 +48069,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "input-group-prepend" }, [
       _c("span", { staticClass: "input-group-text" }, [
-        _c("i", { staticClass: "material-icons" }, [
-          _vm._v(
-            "\r\n                                    person\r\n                                    "
-          )
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "input-group-prepend" }, [
-      _c("span", { staticClass: "input-group-text" }, [
-        _c("i", { staticClass: "material-icons" }, [
-          _vm._v(
-            "\r\n                                    lock_outline\r\n                                    "
-          )
-        ])
+        _c("i", { staticClass: "material-icons" }, [_vm._v("lock_outline")])
       ])
     ])
   },
@@ -48101,7 +48087,7 @@ var staticRenderFns = [
           },
           [
             _vm._v(
-              "\r\n                            Get Started\r\n                            "
+              "\n                                Get Started\n                            "
             )
           ]
         )
@@ -48114,7 +48100,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "text-center" }, [
       _c("p", { staticClass: "description text-white font-weight-bold" }, [
-        _vm._v("Got an account?\r\n                    "),
+        _vm._v("Got an account?\n                    "),
         _c(
           "a",
           {
@@ -48196,31 +48182,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-
-
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    components: {
+        'select-photo': __WEBPACK_IMPORTED_MODULE_0__SelectPhoto_vue___default.a,
+        'display-photo': __WEBPACK_IMPORTED_MODULE_1__DisplayPhoto_vue___default.a
+    },
+    data: function data() {
+        return {
+            activeComponent: 'select-photo'
+        };
+    },
 
-  components: {
-    'select-photo': __WEBPACK_IMPORTED_MODULE_0__SelectPhoto_vue___default.a,
-    'display-photo': __WEBPACK_IMPORTED_MODULE_1__DisplayPhoto_vue___default.a
-  },
-
-  data: function data() {
-    return {
-      activeComponent: 'select-photo'
-    };
-  },
-
-
-  methods: {
-    changeComponent: function changeComponent() {
-      this.activeComponent = 'display-photo';
+    methods: {
+        changeComponent: function changeComponent() {
+            this.activeComponent = 'display-photo';
+        }
     }
-  }
 });
 
 /***/ }),
@@ -48302,45 +48282,35 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-
-
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-
-  components: {
-    'vue-loader': __WEBPACK_IMPORTED_MODULE_0__loader_VueLoader_vue___default.a
-  },
-
-  data: function data() {
-    return {
-      photo: {},
-      isLoading: false
-    };
-  },
-
-
-  methods: {
-    openFileDialog: function openFileDialog() {
-      this.$refs.selectPhoto.click();
+    components: {
+        'vue-loader': __WEBPACK_IMPORTED_MODULE_0__loader_VueLoader_vue___default.a
     },
-    onPhotoSelected: function onPhotoSelected() {
-      var _this = this;
+    data: function data() {
+        return {
+            selectedPhoto: {},
+            isLoading: false
+        };
+    },
 
-      this.photo = this.$refs.selectPhoto.files[0];
+    methods: {
+        openFileDialog: function openFileDialog() {
+            this.$refs.selectPhoto.click();
+        },
+        onPhotoSelected: function onPhotoSelected() {
+            var _this = this;
 
-      this.isLoading = true;
-
-      this.$store.dispatch('getPhotoDetails', this.photo).then(function (response) {
-        // console.log(response);
-        _this.isLoading = false;
-        _this.$emit('photoSelected');
-      });
+            this.selectedPhoto = this.$refs.selectPhoto.files[0];
+            this.isLoading = true;
+            this.$store.dispatch('getPhotoDetails', this.selectedPhoto).then(function (response) {
+                // console.log(response);
+                _this.isLoading = false;
+                _this.$emit('photoSelected');
+            });
+        }
     }
-  }
 });
 
 /***/ }),
@@ -48403,25 +48373,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-
 
 // Import component
 
 // Import stylesheet
 
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-
-	props: ['isLoading'],
-	components: {
-		Loading: __WEBPACK_IMPORTED_MODULE_0_vue_loading_overlay___default.a
-	}
+    props: ['isLoading'],
+    components: {
+        Loading: __WEBPACK_IMPORTED_MODULE_0_vue_loading_overlay___default.a
+    }
 });
 
 /***/ }),
@@ -48978,44 +48939,53 @@ var render = function() {
         { staticClass: "row text-center" },
         [
           _c("div", { staticClass: "col-md-6 mr-auto ml-auto" }, [
-            _c("h1", { staticClass: "title" }, [
-              _vm._v("\n              Submit a photo\n          ")
-            ]),
+            _c("h1", { staticClass: "title" }, [_vm._v("Submit a photo")]),
             _vm._v(" "),
             _c("p", { staticClass: "h5 text-white" }, [
               _vm._v(
-                "\n              When uploaded, your work will be distributed for free.\n          "
+                "\n                    When uploaded, your work will be distributed for free.\n                "
               )
             ]),
             _vm._v(" "),
             _c("p", { staticClass: "text-white" }, [
               _vm._v(
-                "\n              Please only upload photos that you own the rights to.\n          "
+                "\n                    Please only upload photos that you own the rights to.\n                "
               )
             ]),
             _vm._v(" "),
-            _c("input", {
-              directives: [
+            _c("form", { attrs: { enctype: "multipart/form-data" } }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: false,
+                    expression: "false"
+                  }
+                ],
+                ref: "selectPhoto",
+                attrs: { type: "file", name: "photo", accept: "image/*" },
+                on: { change: _vm.onPhotoSelected }
+              }),
+              _vm._v(" "),
+              _c(
+                "button",
                 {
-                  name: "show",
-                  rawName: "v-show",
-                  value: false,
-                  expression: "false"
-                }
-              ],
-              ref: "selectPhoto",
-              attrs: { type: "file", name: "photo", accept: "image/*" },
-              on: { change: _vm.onPhotoSelected }
-            }),
-            _vm._v(" "),
-            _c(
-              "button",
-              {
-                staticClass: "btn btn-info btn-raised mt-4",
-                on: { click: _vm.openFileDialog }
-              },
-              [_vm._v("\n              Add a photo\n          ")]
-            )
+                  staticClass: "btn btn-info btn-raised mt-4",
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.openFileDialog($event)
+                    }
+                  }
+                },
+                [
+                  _vm._v(
+                    "\n                        Add a photo\n                    "
+                  )
+                ]
+              )
+            ])
           ]),
           _vm._v(" "),
           _c("vue-loader", { attrs: { isLoading: _vm.isLoading } })
@@ -49121,7 +49091,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.full-page-photo[data-v-039af310]{\n\theight: 100vh;\n\tbackground-size: cover;\n\tbackground-position: center center;\n\tposition:relative;\n}\n.full-page-photo.active[data-v-039af310]{\n\tz-index:900;\n}\n.photo-overlay[data-v-039af310]{\n\tposition:absolute;\n\tz-index: 0;\n    width: 100%;\n    height: 100%;\n    background-color:rgba(0,0,0,0.5);\n    opacity: 0;\n}\n.active .photo-overlay[data-v-039af310]{\n\topacity: 1;\n}\n.add-details[data-v-039af310]{\n\tposition: absolute;\n\tleft: 0;\n\tright: 0;\n}\n", ""]);
+exports.push([module.i, "\n.full-page-photo[data-v-039af310] {\n    position: relative;\n    background-size: cover;\n    background-position: center center;\n    background-repeat: no-repeat;\n    min-height: 100%;\n    width: 100%;\n}\n.full-page-photo.active[data-v-039af310] {\n    position: absolute;\n    z-index: 900;\n}\n.photo-overlay[data-v-039af310] {\n    position: absolute;\n    z-index: 0;\n    width: 100%;\n    height: 100%;\n    background-color: rgba(0, 0, 0, 0.5);\n    opacity: 0;\n}\n.active .photo-overlay[data-v-039af310] {\n    opacity: 1;\n}\n.add-details[data-v-039af310] {\n    position: relative;\n    left: 0;\n    right: 0;\n}\n\n", ""]);
 
 // exports
 
@@ -49142,34 +49112,27 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-
-
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    components: {
+        'add-details': __WEBPACK_IMPORTED_MODULE_0__AddDetails_vue___default.a
+    },
+    data: function data() {
+        return {
+            hasPhoto: false
+        };
+    },
 
-  components: {
-    'add-details': __WEBPACK_IMPORTED_MODULE_0__AddDetails_vue___default.a
-  },
-
-  data: function data() {
-    return {
-      hasPhoto: false
-    };
-  },
-
-
-  computed: {
-    image: function image() {
-      return URL.createObjectURL(this.$store.state.photo.photo);
+    computed: {
+        image: function image() {
+            return URL.createObjectURL(this.$store.state.selectedPhoto.photo);
+        }
+    },
+    mounted: function mounted() {
+        this.image;
+        this.hasPhoto = true;
     }
-  },
-
-  mounted: function mounted() {
-    this.image;
-    this.hasPhoto = true;
-  }
 });
 
 /***/ }),
@@ -49258,7 +49221,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.nav-pills .nav-item .nav-link[data-v-c185946e]{\n  padding: 3px 15px;\n  min-width: 70px;\n}\n.no-margin-btn[data-v-c185946e]{\n  margin:0;\n}\n", ""]);
+exports.push([module.i, "\n.nav-pills .nav-item .nav-link[data-v-c185946e] {\n    padding: 3px 15px;\n    min-width: 70px;\n}\n.p-tab[data-v-c185946e] {\n    pointer-events: none;\n    cursor: default;\n}\n.no-margin[data-v-c185946e] {\n    margin: 0;\n}\n\n", ""]);
 
 // exports
 
@@ -49323,21 +49286,73 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
-
+//
+//
+//
+//
 
 
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    components: {
+        'exif': __WEBPACK_IMPORTED_MODULE_0__Exif_vue___default.a,
+        'story': __WEBPACK_IMPORTED_MODULE_1__Story_vue___default.a,
+        'tag': __WEBPACK_IMPORTED_MODULE_2__Tag_vue___default.a,
+        'gps': __WEBPACK_IMPORTED_MODULE_3__GPS_vue___default.a
+    },
+    data: function data() {
+        return {
+            currentTab: 1,
+            isLastTab: false,
+            components: ['exif', 'story', 'tag', 'gps'],
+            activeComponent: 'exif'
+        };
+    },
 
-	components: {
-		'exif': __WEBPACK_IMPORTED_MODULE_0__Exif_vue___default.a,
-		'story': __WEBPACK_IMPORTED_MODULE_1__Story_vue___default.a,
-		'tag': __WEBPACK_IMPORTED_MODULE_2__Tag_vue___default.a,
-		'gps': __WEBPACK_IMPORTED_MODULE_3__GPS_vue___default.a
-	}
+    computed: {
+        photo: function photo() {
+            return this.$store.state.selectedPhoto.photo;
+        }
+    },
+    methods: {
+        showNextTab: function showNextTab() {
+            var tabs = document.getElementsByClassName('p-tab');
+            // could be used if submit button was not needed to show
+            // if (this.currentTab >= tabs.length) {
+            //     // return; // means do not execute code below it               
+            // }
+            if (this.currentTab == tabs.length - 1) {
+                this.isLastTab = true;
+            }
+            tabs[this.currentTab].click();
+            this.activeComponent = this.components[this.currentTab];
+            this.currentTab++;
+        },
+        uploadPhoto: function uploadPhoto() {
+            var _this = this;
+
+            this.$store.dispatch('mergeAllDetails').then(function (response) {
+                var formData = new FormData();
+                formData.append('photo', _this.photo);
+                formData.append('details', JSON.stringify(response));
+                axios.post('/photo/upload', formData).then(function (res) {
+                    _this.$toasted.success(res.data, {
+                        theme: 'bubble',
+                        icon: {
+                            name: 'thumb_up',
+                            after: true
+                        },
+                        position: 'top-center',
+                        duration: 4000
+                    });
+                }).catch(function (errors) {
+                    return console.log(errors.response.data);
+                });
+            });
+        }
+    }
 });
 
 /***/ }),
@@ -49440,35 +49455,88 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      hasAllDetails: true
-    };
-  },
+    data: function data() {
+        return {
+            hasAllDetails: true,
+            isEditing: false
+        };
+    },
 
-
-  computed: {
-    photoDetails: {
-      get: function get() {
-        return this.$store.state.photo.details;
-      },
-      set: function set() {
-        this.$store.state.photo.details;
-      }
+    computed: {
+        photoDetails: {
+            get: function get() {
+                return this.$store.state.selectedPhoto.details;
+            },
+            set: function set() {
+                this.$store.state.selectedPhoto.details;
+            }
+        }
+    },
+    mounted: function mounted() {
+        for (var detail in this.photoDetails) {
+            if (this.photoDetails[detail] == "") {
+                this.hasAllDetails = false;
+                break;
+            }
+        }
+    },
+    beforeDestroy: function beforeDestroy() {
+        this.$store.dispatch('setUploadPhotoDetails', {
+            key: 'exif',
+            value: this.photoDetails
+        });
     }
-  },
-
-  mounted: function mounted() {
-    for (var detail in this.photoDetails) {
-      if (this.photoDetails[detail] == "") {
-        this.hasAllDetails = false;
-        break;
-      }
-    }
-  }
 });
 
 /***/ }),
@@ -49491,79 +49559,334 @@ var render = function() {
             )
           ]),
       _vm._v(" "),
-      _c("button", { staticClass: "btn btn-link text-white" }, [
-        _vm._v("Edit")
-      ]),
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-link text-white",
+          on: {
+            click: function($event) {
+              _vm.isEditing = true
+            }
+          }
+        },
+        [_vm._v("Edit")]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "row mt-3" }, [
-        _c("div", { staticClass: "col-12 col-xl-6" }, [
-          _c("div", { staticClass: "row text-white" }, [
-            _c("div", { staticClass: "col-md-12 mt-3" }, [
-              _c("span", { staticClass: "h5" }, [_vm._v("Make --")]),
-              _vm._v(" "),
-              _vm.photoDetails.make
-                ? _c("span", { staticClass: "h5" }, [
-                    _vm._v(_vm._s(_vm.photoDetails.make))
-                  ])
-                : _vm._e()
+      !_vm.isEditing
+        ? _c("div", { staticClass: "row mt-3" }, [
+            _c("div", { staticClass: "col-12 col-xl-6" }, [
+              _c("div", { staticClass: "row text-white" }, [
+                _c("div", { staticClass: "col-md-12 mt-3" }, [
+                  _c("span", { staticClass: "h5" }, [_vm._v("Make --")]),
+                  _vm._v(" "),
+                  _vm.photoDetails.make
+                    ? _c("span", { staticClass: "h5" }, [
+                        _vm._v(_vm._s(_vm.photoDetails.make))
+                      ])
+                    : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-12 mt-3" }, [
+                  _c("span", { staticClass: "h5" }, [_vm._v("Model --")]),
+                  _vm._v(" "),
+                  _vm.photoDetails.model
+                    ? _c("span", { staticClass: "h5" }, [
+                        _vm._v(_vm._s(_vm.photoDetails.model))
+                      ])
+                    : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-12 mt-3" }, [
+                  _c("span", { staticClass: "h5" }, [_vm._v("Aperture --")]),
+                  _vm._v(" "),
+                  _vm.photoDetails.aperture
+                    ? _c("span", { staticClass: "h5" }, [
+                        _vm._v("f/" + _vm._s(_vm.photoDetails.aperture))
+                      ])
+                    : _vm._e()
+                ])
+              ])
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "col-md-12 mt-3" }, [
-              _c("span", { staticClass: "h5" }, [_vm._v("Model --")]),
-              _vm._v(" "),
-              _vm.photoDetails.model
-                ? _c("span", { staticClass: "h5" }, [
-                    _vm._v(_vm._s(_vm.photoDetails.model))
-                  ])
-                : _vm._e()
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-md-12 mt-3" }, [
-              _c("span", { staticClass: "h5" }, [_vm._v("Aperture --")]),
-              _vm._v(" "),
-              _vm.photoDetails.aperture
-                ? _c("span", { staticClass: "h5" }, [
-                    _vm._v("f/" + _vm._s(_vm.photoDetails.aperture))
-                  ])
-                : _vm._e()
+            _c("div", { staticClass: "col-12 col-xl-6" }, [
+              _c("div", { staticClass: "row text-white" }, [
+                _c("div", { staticClass: "col-md-12 mt-3" }, [
+                  _c("span", { staticClass: "h5" }, [
+                    _vm._v("Exposure Time --")
+                  ]),
+                  _vm._v(" "),
+                  _vm.photoDetails.exposure_time
+                    ? _c("span", { staticClass: "h5" }, [
+                        _vm._v(_vm._s(_vm.photoDetails.exposure_time) + " sec.")
+                      ])
+                    : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-12 mt-3" }, [
+                  _c("span", { staticClass: "h5" }, [
+                    _vm._v("Focal Length --")
+                  ]),
+                  _vm._v(" "),
+                  _vm.photoDetails.focal_length
+                    ? _c("span", { staticClass: "h5" }, [
+                        _vm._v(_vm._s(_vm.photoDetails.focal_length) + "mm")
+                      ])
+                    : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-12 mt-3" }, [
+                  _c("span", { staticClass: "h5" }, [_vm._v("ISO --")]),
+                  _vm._v(" "),
+                  _vm.photoDetails.iso
+                    ? _c("span", { staticClass: "h5" }, [
+                        _vm._v(_vm._s(_vm.photoDetails.iso))
+                      ])
+                    : _vm._e()
+                ])
+              ])
             ])
           ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-12 col-xl-6" }, [
-          _c("div", { staticClass: "row text-white" }, [
-            _c("div", { staticClass: "col-md-12 mt-3" }, [
-              _c("span", { staticClass: "h5" }, [_vm._v("Exposure Time --")]),
-              _vm._v(" "),
-              _vm.photoDetails.exposure_time
-                ? _c("span", { staticClass: "h5" }, [
-                    _vm._v(_vm._s(_vm.photoDetails.exposure_time) + " sec.")
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.isEditing
+        ? _c("div", { staticClass: "row mt-3" }, [
+            _c("div", { staticClass: "col-12 col-xl-6" }, [
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-md-12" }, [
+                  _c("div", { staticClass: "form-group has-info" }, [
+                    _c(
+                      "label",
+                      { staticClass: "h4 text-white", attrs: { for: "make" } },
+                      [_vm._v("Make")]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model.lazy",
+                          value: _vm.photoDetails.make,
+                          expression: "photoDetails.make",
+                          modifiers: { lazy: true }
+                        }
+                      ],
+                      staticClass: "form-control text-white",
+                      attrs: { type: "text", placeholder: "Canon" },
+                      domProps: { value: _vm.photoDetails.make },
+                      on: {
+                        change: function($event) {
+                          _vm.$set(
+                            _vm.photoDetails,
+                            "make",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
                   ])
-                : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-12" }, [
+                  _c("div", { staticClass: "form-group has-info" }, [
+                    _c(
+                      "label",
+                      { staticClass: "h4 text-white", attrs: { for: "model" } },
+                      [_vm._v("Model")]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model.lazy",
+                          value: _vm.photoDetails.model,
+                          expression: "photoDetails.model",
+                          modifiers: { lazy: true }
+                        }
+                      ],
+                      staticClass: "form-control text-white",
+                      attrs: { type: "text", placeholder: "Canon EOS 40D" },
+                      domProps: { value: _vm.photoDetails.model },
+                      on: {
+                        change: function($event) {
+                          _vm.$set(
+                            _vm.photoDetails,
+                            "model",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-12" }, [
+                  _c("div", { staticClass: "form-group has-info" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "h4 text-white",
+                        attrs: { for: "aperture" }
+                      },
+                      [_vm._v("Aperture (f)")]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model.lazy",
+                          value: _vm.photoDetails.aperture,
+                          expression: "photoDetails.aperture",
+                          modifiers: { lazy: true }
+                        }
+                      ],
+                      staticClass: "form-control text-white",
+                      attrs: { type: "text", placeholder: "7.1" },
+                      domProps: { value: _vm.photoDetails.aperture },
+                      on: {
+                        change: function($event) {
+                          _vm.$set(
+                            _vm.photoDetails,
+                            "aperture",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  ])
+                ])
+              ])
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "col-md-12 mt-3" }, [
-              _c("span", { staticClass: "h5" }, [_vm._v("Focal Length --")]),
-              _vm._v(" "),
-              _vm.photoDetails.focal_length
-                ? _c("span", { staticClass: "h5" }, [
-                    _vm._v(_vm._s(_vm.photoDetails.focal_length) + "mm")
+            _c("div", { staticClass: "col-12 col-xl-6" }, [
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-md-12" }, [
+                  _c("div", { staticClass: "form-group has-info" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "h4 text-white",
+                        attrs: { for: "exposureTime" }
+                      },
+                      [_vm._v("Exposure Time (sec.)")]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model.lazy",
+                          value: _vm.photoDetails.exposure_time,
+                          expression: "photoDetails.exposure_time",
+                          modifiers: { lazy: true }
+                        }
+                      ],
+                      staticClass: "form-control text-white",
+                      attrs: { type: "text", placeholder: "1/700" },
+                      domProps: { value: _vm.photoDetails.exposure_time },
+                      on: {
+                        change: function($event) {
+                          _vm.$set(
+                            _vm.photoDetails,
+                            "exposure_time",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
                   ])
-                : _vm._e()
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-md-12 mt-3" }, [
-              _c("span", { staticClass: "h5" }, [_vm._v("ISO --")]),
-              _vm._v(" "),
-              _vm.photoDetails.iso
-                ? _c("span", { staticClass: "h5" }, [
-                    _vm._v(_vm._s(_vm.photoDetails.iso))
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-12" }, [
+                  _c("div", { staticClass: "form-group has-info" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "h4 text-white",
+                        attrs: { for: "focalLength" }
+                      },
+                      [_vm._v("Focal Length (mm)")]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model.lazy",
+                          value: _vm.photoDetails.focal_length,
+                          expression: "photoDetails.focal_length",
+                          modifiers: { lazy: true }
+                        }
+                      ],
+                      staticClass: "form-control text-white",
+                      attrs: { type: "text", placeholder: "70" },
+                      domProps: { value: _vm.photoDetails.focal_length },
+                      on: {
+                        change: function($event) {
+                          _vm.$set(
+                            _vm.photoDetails,
+                            "focal_length",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
                   ])
-                : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-12" }, [
+                  _c("div", { staticClass: "form-group has-info" }, [
+                    _c(
+                      "label",
+                      { staticClass: "h4 text-white", attrs: { for: "iso" } },
+                      [_vm._v("ISO")]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model.lazy",
+                          value: _vm.photoDetails.iso,
+                          expression: "photoDetails.iso",
+                          modifiers: { lazy: true }
+                        }
+                      ],
+                      staticClass: "form-control text-white",
+                      attrs: { type: "text", placeholder: "800" },
+                      domProps: { value: _vm.photoDetails.iso },
+                      on: {
+                        change: function($event) {
+                          _vm.$set(_vm.photoDetails, "iso", $event.target.value)
+                        }
+                      }
+                    })
+                  ])
+                ])
+              ])
             ])
           ])
-        ])
-      ])
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.isEditing
+        ? _c("div", { staticClass: "row" }, [
+            _c("div", { staticClass: "col-12" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-success btn-sm float-right",
+                  on: {
+                    click: function($event) {
+                      _vm.isEditing = !_vm.isEditing
+                    }
+                  }
+                },
+                [_vm._v("Save")]
+              )
+            ])
+          ])
+        : _vm._e()
     ])
   ])
 }
@@ -49652,14 +49975,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {};
-  }
+    data: function data() {
+        return {
+            photo: {
+                title: '',
+                story: ''
+            }
+        };
+    },
+    beforeDestroy: function beforeDestroy() {
+        this.$store.dispatch('setUploadPhotoDetails', {
+            key: 'story',
+            value: this.photo
+        });
+    }
 });
 
 /***/ }),
@@ -49670,59 +50001,89 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", { staticClass: "container" }, [
+    _c("div", { staticClass: "section" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-md-12" }, [
+          _c("div", { staticClass: "form-group has-info mt-3" }, [
+            _c(
+              "label",
+              { staticClass: "h4 text-white", attrs: { for: "title" } },
+              [_vm._v("Title (optional)")]
+            ),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model.lazy",
+                  value: _vm.photo.title,
+                  expression: "photo.title",
+                  modifiers: { lazy: true }
+                }
+              ],
+              staticClass: "form-control text-white",
+              attrs: {
+                type: "text",
+                placeholder: "Passing through the bliss..."
+              },
+              domProps: { value: _vm.photo.title },
+              on: {
+                change: function($event) {
+                  _vm.$set(_vm.photo, "title", $event.target.value)
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group has-info" }, [
+            _c(
+              "label",
+              { staticClass: "h4 text-white", attrs: { for: "story" } },
+              [_vm._v("Story (optional)")]
+            ),
+            _vm._v(" "),
+            _c("textarea", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model.lazy",
+                  value: _vm.photo.story,
+                  expression: "photo.story",
+                  modifiers: { lazy: true }
+                }
+              ],
+              staticClass: "form-control text-white",
+              attrs: { rows: "3" },
+              domProps: { value: _vm.photo.story },
+              on: {
+                change: function($event) {
+                  _vm.$set(_vm.photo, "story", $event.target.value)
+                }
+              }
+            })
+          ])
+        ])
+      ])
+    ])
+  ])
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "container" }, [
-      _c("div", { staticClass: "section" }, [
-        _c("div", { staticClass: "text-white" }, [
-          _c("p", { staticClass: "h5" }, [
-            _vm._v("Share something interesting about your photo.")
-          ]),
-          _vm._v(" "),
-          _c("p", { staticClass: "h5" }, [
-            _vm._v(
-              "How did you take this shot? What makes this photo special to you?"
-            )
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-md-12" }, [
-            _c("div", { staticClass: "form-group has-info mt-3" }, [
-              _c(
-                "label",
-                { staticClass: "h4 text-white", attrs: { for: "title" } },
-                [_vm._v("Title (optional)")]
-              ),
-              _vm._v(" "),
-              _c("input", {
-                staticClass: "form-control text-white",
-                attrs: {
-                  type: "text",
-                  placeholder: "Passing through the bliss..."
-                }
-              })
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "form-group has-info" }, [
-              _c(
-                "label",
-                { staticClass: "h4 text-white", attrs: { for: "story" } },
-                [_vm._v("Story (optional)")]
-              ),
-              _vm._v(" "),
-              _c("textarea", {
-                staticClass: "form-control text-white",
-                attrs: { rows: "3" }
-              })
-            ])
-          ])
-        ])
+    return _c("div", { staticClass: "text-white" }, [
+      _c("p", { staticClass: "h5" }, [
+        _vm._v("Share something interesting about your photo.")
+      ]),
+      _vm._v(" "),
+      _c("p", { staticClass: "h5" }, [
+        _vm._v(
+          "How did you take this shot? What makes this photo special to you?"
+        )
       ])
     ])
   }
@@ -49799,30 +50160,47 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    components: {
+        'tags-input': __WEBPACK_IMPORTED_MODULE_0__voerro_vue_tagsinput__["a" /* default */]
+    },
+    data: function data() {
+        return {
+            tags: [],
+            allTags: {},
+            existingTags: {}
+        };
+    },
 
-	components: {
-		'tags-input': __WEBPACK_IMPORTED_MODULE_0__voerro_vue_tagsinput__["a" /* default */]
-	},
+    computed: {
+        getAllTags: function getAllTags() {
+            var _this = this;
 
-	data: function data() {
-		return {
-			selectedTags: []
-		};
-	}
+            axios.get('/tags').then(function (response) {
+                return _this.allTags = response.data.tags;
+            }).catch(function (errors) {
+                return console.log(errors.response.data);
+            });
+        },
+        populateTags: function populateTags() {
+            var _this2 = this;
+
+            this.allTags.forEach(function (tag) {
+                _this2.existingTags[tag.name] = tag.name;
+            });
+        }
+    },
+    mounted: function mounted() {
+        this.getAllTags;
+    },
+    beforeDestroy: function beforeDestroy() {
+        this.$store.dispatch('setUploadPhotoDetails', {
+            key: 'tags',
+            value: this.tags
+        });
+    }
 });
 
 /***/ }),
@@ -50500,20 +50878,16 @@ var render = function() {
         _c("tags-input", {
           attrs: {
             "element-id": "tags",
-            "existing-tags": {
-              "web-development": "Web Development",
-              php: "PHP",
-              javascript: "JavaScript"
-            },
+            "existing-tags": _vm.existingTags,
             typeahead: true,
             "input-class": "form-control text-white"
           },
           model: {
-            value: _vm.selectedTags,
+            value: _vm.tags,
             callback: function($$v) {
-              _vm.selectedTags = $$v
+              _vm.tags = $$v
             },
-            expression: "selectedTags"
+            expression: "tags"
           }
         })
       ],
@@ -50594,57 +50968,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      latLng: { lat: 27.7172, lng: 85.3240 },
-      markers: [{
-        position: { lat: 27.7172, lng: 85.3240 }
-      }],
-
-      selectedPlace: {},
-      selectedPlaceName: ''
-
-    };
-  },
-
-
-  methods: {
-    setPlaceOnMap: function setPlaceOnMap(place) {
-
-      if (place) {
-        this.selectedPlace = {
-          lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng()
+    data: function data() {
+        return {
+            photoLocation: ''
         };
-        this.markers.push({ position: this.selectedPlace });
-        this.latLng = this.selectedPlace;
-      }
+    },
+    updated: function updated() {
+        this.$store.dispatch('setUploadPhotoDetails', {
+            key: 'location',
+            value: this.photoLocation
+        });
     }
-  }
 });
 
 /***/ }),
@@ -50656,53 +50992,38 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
-    _c(
-      "div",
-      { staticClass: "section" },
-      [
+    _c("div", { staticClass: "section" }, [
+      _c("div", { staticClass: "form-group has-info" }, [
         _c(
-          "div",
-          { staticClass: "form-group has-info" },
-          [
-            _c(
-              "label",
-              {
-                staticClass: "h4 title text-white",
-                attrs: { for: "location" }
-              },
-              [_vm._v("Location")]
-            ),
-            _vm._v(" "),
-            _c("gmap-autocomplete", {
-              staticClass: "form-control text-white",
-              attrs: { placeholder: "Where did you take this photograph" },
-              on: { place_changed: _vm.setPlaceOnMap }
-            })
-          ],
-          1
+          "label",
+          { staticClass: "h4 title text-white", attrs: { for: "location" } },
+          [_vm._v("Location")]
         ),
         _vm._v(" "),
-        _c(
-          "GmapMap",
-          {
-            staticStyle: { height: "15rem" },
-            attrs: { center: _vm.latLng, zoom: 11, "map-type-id": "roadmap" }
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model.lazy",
+              value: _vm.photoLocation,
+              expression: "photoLocation",
+              modifiers: { lazy: true }
+            }
+          ],
+          staticClass: "form-control text-white",
+          attrs: {
+            type: "text",
+            placeholder: "Where did you take this photograph..."
           },
-          _vm._l(_vm.markers, function(m, index) {
-            return _c("GmapMarker", {
-              key: index,
-              attrs: { position: m.position, clickable: true, draggable: true },
-              on: {
-                click: function($event) {
-                  _vm.center = m.position
-                }
-              }
-            })
-          })
-        )
-      ],
-      1
-    )
+          domProps: { value: _vm.photoLocation },
+          on: {
+            change: function($event) {
+              _vm.photoLocation = $event.target.value
+            }
+          }
+        })
+      ])
+    ])
   ])
 }
 var staticRenderFns = []
@@ -50732,31 +51053,34 @@ var render = function() {
           _c(
             "div",
             { staticClass: "tab-pane active", attrs: { id: "exif" } },
-            [_c("exif")],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "tab-pane", attrs: { id: "story" } },
-            [_c("story")],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "tab-pane", attrs: { id: "tags" } },
-            [_c("tag")],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "tab-pane", attrs: { id: "gps" } },
-            [_c("gps")],
+            [_c(_vm.activeComponent, { tag: "component" })],
             1
           )
         ])
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-md-11" }, [
+        !_vm.isLastTab
+          ? _c(
+              "button",
+              {
+                staticClass:
+                  "btn btn-default btn-sm float-right mr-3 no-margin",
+                on: { click: _vm.showNextTab }
+              },
+              [_vm._v("Next")]
+            )
+          : _c(
+              "button",
+              {
+                staticClass:
+                  "btn btn-primary btn-sm float-right mr-3 no-margin",
+                on: { click: _vm.uploadPhoto }
+              },
+              [_vm._v("Submit")]
+            )
       ])
     ]),
     _vm._v(" "),
@@ -50780,7 +51104,7 @@ var staticRenderFns = [
                   _c(
                     "a",
                     {
-                      staticClass: "nav-link text-white active",
+                      staticClass: "nav-link text-white p-tab active",
                       attrs: { href: "#exif", "data-toggle": "tab" }
                     },
                     [_vm._v("EXIF")]
@@ -50791,7 +51115,7 @@ var staticRenderFns = [
                   _c(
                     "a",
                     {
-                      staticClass: "nav-link text-white",
+                      staticClass: "nav-link text-white p-tab",
                       attrs: { href: "#story", "data-toggle": "tab" }
                     },
                     [_vm._v("Story")]
@@ -50802,7 +51126,7 @@ var staticRenderFns = [
                   _c(
                     "a",
                     {
-                      staticClass: "nav-link text-white",
+                      staticClass: "nav-link text-white p-tab",
                       attrs: { href: "#tags", "data-toggle": "tab" }
                     },
                     [_vm._v("Tags")]
@@ -50813,7 +51137,7 @@ var staticRenderFns = [
                   _c(
                     "a",
                     {
-                      staticClass: "nav-link text-white",
+                      staticClass: "nav-link text-white p-tab",
                       attrs: { href: "#gps", "data-toggle": "tab" }
                     },
                     [_vm._v("GPS")]
@@ -50830,17 +51154,15 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
+    return _c("div", { staticClass: "row mt-6" }, [
       _c(
         "div",
-        {
-          staticClass: "col-4 col-sm-3 col-md-2 col-lg-1 mr-auto ml-auto mt-0"
-        },
+        { staticClass: "col-4 col-sm-3 col-md-2 col-lg-1 mr-auto ml-auto" },
         [
           _c(
             "a",
             {
-              staticClass: "btn btn-danger btn-sm btn-raised no-margin-btn",
+              staticClass: "btn btn-danger btn-sm btn-raised",
               attrs: { href: "/photo/submit" }
             },
             [_vm._v("Cancel")]

@@ -5,31 +5,24 @@
                 <div class="card card-login">
                     <form @submit.prevent="signIn">
                         <div class="card-header card-header-info">
-                            <h3 class="card-title text-center">
-                        Sign In
-                        </h3>
+                            <h3 class="card-title text-center">Sign In</h3>
                         </div>
                         <div class="card-body">
                             <div class="input-group has-info">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
-                                    <i class="material-icons">
-                                    mail
-                                    </i>
-                                </span>
+                                        <i class="material-icons">mail</i>
+                                    </span>
                                 </div>
-                                <input class="form-control" name="email" placeholder="E-mail address" type="email" v-model.lazy="user.email"/>
+                                <input class="form-control" name="email" placeholder="E-mail address" type="email" v-model.lazy="user.email" />
                             </div>
                             <small class="form-text text-center text-danger" v-if="errors.email">{{errors.email[0]}}</small>
                             <small class="form-text text-center text-danger" v-if="errors.invalidLogin">{{errors.invalidLogin}}</small>
-
                             <div class="input-group has-info">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
-                                    <i class="material-icons">
-                                    lock_outline
-                                    </i>
-                                </span>
+                                        <i class="material-icons">lock_outline</i>
+                                    </span>
                                 </div>
                                 <input class="form-control" name="password" placeholder="Password" type="password" v-model.lazy="user.password" />
                             </div>
@@ -54,35 +47,37 @@
         </div>
     </div>
 </template>
-
 <script>
-export default {
-    data() {
-      return {
-        user:{
-            email:'',
-            password:''
+    export default {
+        data() {
+            return {
+                user: {
+                    email: '',
+                    password: ''
+                },
+                errors: {},
+            }
         },
-        errors:{},
-      }
-    },
-
-    methods:{
-        signIn(){
-            var vm=this;
-            axios.post('sign-in',this.user)
-            .then(response =>{
-                if (response.data.authenticated) {
-                    location.reload();
-                    this.user="";
-                    this.errors="";
-                }else{
-                    this.errors={invalidLogin:"Invalid Login! Please try again"}    
-                }         
-            })
-            .catch(errors => {this.errors=errors.response.data.errors})
+        methods: {
+            signIn() {
+                var vm = this;
+                axios.post('sign-in', this.user)
+                    .then(response => {
+                        if (response.data.authenticated) {
+                            location.reload();
+                            this.user = "";
+                            this.errors = "";
+                        } else {
+                            this.errors = {
+                                invalidLogin: "Invalid Login! Please try again"
+                            }
+                        }
+                    })
+                    .catch(errors => {
+                        this.errors = errors.response.data.errors
+                    })
+            }
         }
     }
-}
 
 </script>
