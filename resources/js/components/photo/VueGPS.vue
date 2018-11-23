@@ -13,44 +13,45 @@
     </div>
 </template>
 <script>
-    export default {
-        data() {
-            return {
-                latLng: {
-                    lat: 27.7172,
-                    lng: 85.3240
-                },
-                markers: [{
-                    position: {
-                        lat: 27.7172,
-                        lng: 85.3240
-                    },
-                }],
-                selectedPlace: {},
-                photoLocation: ''
-            }
-        },
-        methods: {
-            setPlaceOnMap(place) {
-                if (place) {
-                    this.selectedPlace = {
-                        lat: place.geometry.location.lat(),
-                        lng: place.geometry.location.lng(),
-                    }
-                    this.markers.push({
-                        position: this.selectedPlace
-                    });
-                    this.latLng = this.selectedPlace;
-                    this.photoLocation = place.name;
-                }
-            }
-        },
-        beforeUpdate() {
-            console.log('gps being updated');
-        },
-        updated() {
-            console.log('gps updated');
+export default {
+  data() {
+    return {
+      latLng: {
+        lat: 27.7172,
+        lng: 85.324
+      },
+      markers: [
+        {
+          position: {
+            lat: 27.7172,
+            lng: 85.324
+          }
         }
+      ],
+      selectedPlace: {},
+      photoLocation: ""
+    };
+  },
+  methods: {
+    setPlaceOnMap(place) {
+      if (place) {
+        this.selectedPlace = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng()
+        };
+        this.markers.push({
+          position: this.selectedPlace
+        });
+        this.latLng = this.selectedPlace;
+        this.photoLocation = place.name;
+      }
     }
-
+  },
+  beforeUpdate() {
+    console.log("gps being updated");
+  },
+  updated() {
+    console.log("gps updated");
+  }
+};
 </script>

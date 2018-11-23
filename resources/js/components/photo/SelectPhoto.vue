@@ -10,12 +10,10 @@
                     <p class="text-white">
                         Please only upload photos that you own the rights to.
                     </p>
-                    <form enctype="multipart/form-data">
-                        <input type="file" name="photo" accept="image/*" ref="selectPhoto" @change="onPhotoSelected" v-show="false">
-                        <button class="btn btn-info btn-raised mt-4" @click.prevent="openFileDialog">
-                            Add a photo
-                        </button>
-                    </form>
+                    <input type="file" accept="image/*" ref="selectPhoto" @change="onPhotoSelected" v-show="false" />
+                    <button class="btn btn-info btn-raised mt-4" @click.prevent="openFileDialog">
+                        Add a photo
+                    </button>
                 </div>
                 <vue-loader :isLoading="isLoading"></vue-loader>
             </div>
@@ -23,31 +21,32 @@
     </div>
 </template>
 <script>
-    import VueLoader from '../loader/VueLoader.vue';
-    export default {
-        components: {
-            'vue-loader': VueLoader
-        },
-        data() {
-            return {
-                selectedPhoto: {},
-                isLoading: false
-            }
-        },
-        methods: {
-            openFileDialog() {
-                this.$refs.selectPhoto.click();
-            },
-            onPhotoSelected() {
-                this.selectedPhoto = this.$refs.selectPhoto.files[0];
-                this.isLoading = true;
-                this.$store.dispatch('getPhotoDetails', this.selectedPhoto).then(response => {
-                    // console.log(response);
-                    this.isLoading = false;
-                    this.$emit('photoSelected');
-                });
-            }
-        },
+import VueLoader from "../loader/VueLoader.vue";
+export default {
+  components: {
+    "vue-loader": VueLoader
+  },
+  data() {
+    return {
+      selectedPhoto: null,
+      isLoading: false
+    };
+  },
+  methods: {
+    openFileDialog() {
+      this.$refs.selectPhoto.click();
+    },
+    onPhotoSelected() {
+      this.selectedPhoto = this.$refs.selectPhoto.files[0];
+      this.isLoading = true;
+      this.$store
+        .dispatch("getPhotoDetails", this.selectedPhoto)
+        .then(response => {
+          // console.log(response);
+          this.isLoading = false;
+          this.$emit("photoSelected");
+        });
     }
-
+  }
+};
 </script>

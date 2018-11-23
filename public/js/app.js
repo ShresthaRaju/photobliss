@@ -25865,7 +25865,7 @@ exports.default = function (input) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(24);
-module.exports = __webpack_require__(134);
+module.exports = __webpack_require__(137);
 
 
 /***/ }),
@@ -25879,7 +25879,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue2_google_maps__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue2_google_maps___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue2_google_maps__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__vuex_centralStore__ = __webpack_require__(84);
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -25899,10 +25898,10 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_0_vue_toasted___default.a);
 //vue google maps
 
 Vue.use(__WEBPACK_IMPORTED_MODULE_1_vue2_google_maps__, {
-  load: {
-    key: 'AIzaSyBhztCK9gFVGR9tIHxbRgRC3ui8miMZ13M',
-    libraries: 'places'
-  }
+    load: {
+        key: "AIzaSyBhztCK9gFVGR9tIHxbRgRC3ui8miMZ13M",
+        libraries: "places"
+    }
 });
 
 // vuex central store
@@ -25914,13 +25913,14 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_1_vue2_google_maps__, {
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('sign-in', __webpack_require__(86));
-Vue.component('sign-up', __webpack_require__(89));
-Vue.component('submit-photo', __webpack_require__(92));
+Vue.component("sign-in", __webpack_require__(86));
+Vue.component("sign-up", __webpack_require__(89));
+Vue.component("submit-photo", __webpack_require__(92));
+Vue.component("user-profile", __webpack_require__(134));
 
 var app = new Vue({
-  store: __WEBPACK_IMPORTED_MODULE_2__vuex_centralStore__["a" /* centralStore */],
-  el: '#app'
+    store: __WEBPACK_IMPORTED_MODULE_2__vuex_centralStore__["a" /* centralStore */],
+    el: "#app"
 });
 
 /***/ }),
@@ -46357,13 +46357,17 @@ var centralStore = new __WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */].Sto
         // pull the details of the photo selected by user to upload
         getPhotoDetails: function getPhotoDetails(_ref, selectedPhoto) {
             var dispatch = _ref.dispatch;
+
             //parameter {dispatch} is given so that we can call an action inside another action
             return new Promise(function (resolve, reject) {
                 var formData = new FormData();
-                formData.append('selected_photo', selectedPhoto);
+                formData.append("selected_photo", selectedPhoto);
 
-                axios.post('/photo/get-details', formData).then(function (response) {
-                    dispatch('setPhotoDetails', { photo: selectedPhoto, details: response.data });
+                axios.post("/photo/get-details", formData).then(function (response) {
+                    dispatch("setPhotoDetails", {
+                        photo: selectedPhoto,
+                        details: response.data
+                    });
                     resolve("completed");
                     // resolve('completed') is received as a response by the dispatcher.
                     // in this case the dispatcher is SelectPhoto.vue
@@ -46377,7 +46381,7 @@ var centralStore = new __WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */].Sto
         // set the extracted details of the selected photo in the store
         setPhotoDetails: function setPhotoDetails(context, payload) {
             //can be given any parameter name, not necessarily payload
-            context.commit('storeSelectedPhoto', payload);
+            context.commit("storeSelectedPhoto", payload);
         },
 
 
@@ -46385,23 +46389,23 @@ var centralStore = new __WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */].Sto
         setUploadPhotoDetails: function setUploadPhotoDetails(_ref2, payload) {
             var commit = _ref2.commit;
 
-            commit('storePhotoToUpload', payload);
+            commit("storePhotoToUpload", payload);
         },
         mergeAllDetails: function mergeAllDetails(context) {
             return new Promise(function (resolve, reject) {
                 var properties = context.state.photoToUpload;
 
                 var photo = {
-                    'title': properties.story.title,
-                    'story': properties.story.story,
-                    'make': properties.exif.make,
-                    'model': properties.exif.model,
-                    'aperture': properties.exif.aperture,
-                    'exposure_time': properties.exif.exposure_time,
-                    'focal_length': properties.exif.focal_length,
-                    'iso': properties.exif.iso,
-                    'tags': properties.tags,
-                    'location': properties.location
+                    title: properties.story.title,
+                    story: properties.story.story,
+                    make: properties.exif.make,
+                    model: properties.exif.model,
+                    aperture: properties.exif.aperture,
+                    exposure_time: properties.exif.exposure_time,
+                    focal_length: properties.exif.focal_length,
+                    iso: properties.exif.iso,
+                    tags: properties.tags,
+                    location: properties.location ? properties.location : " "
                 };
 
                 resolve(photo);
@@ -47459,36 +47463,35 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            user: {
-                email: '',
-                password: ''
-            },
-            errors: {}
-        };
-    },
+  data: function data() {
+    return {
+      user: {
+        email: "",
+        password: ""
+      },
+      errors: {}
+    };
+  },
 
-    methods: {
-        signIn: function signIn() {
-            var _this = this;
+  methods: {
+    signIn: function signIn() {
+      var _this = this;
 
-            var vm = this;
-            axios.post('sign-in', this.user).then(function (response) {
-                if (response.data.authenticated) {
-                    location.reload();
-                    _this.user = "";
-                    _this.errors = "";
-                } else {
-                    _this.errors = {
-                        invalidLogin: "Invalid Login! Please try again"
-                    };
-                }
-            }).catch(function (errors) {
-                _this.errors = errors.response.data.errors;
-            });
+      axios.post("sign-in", this.user).then(function (response) {
+        if (response.data.authenticated) {
+          location.reload();
+          _this.user = "";
+          _this.errors = "";
+        } else {
+          _this.errors = {
+            invalidLogin: "Invalid Login! Please try again"
+          };
         }
+      }).catch(function (errors) {
+        _this.errors = errors.response.data.errors;
+      });
     }
+  }
 });
 
 /***/ }),
@@ -47807,40 +47810,40 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            user: {
-                fullName: '',
-                email: '',
-                username: '',
-                password: ''
-            },
-            formErrors: {}
-        };
-    },
+  data: function data() {
+    return {
+      user: {
+        fullName: "",
+        email: "",
+        username: "",
+        password: ""
+      },
+      formErrors: {}
+    };
+  },
 
-    methods: {
-        registerUser: function registerUser() {
-            var _this = this;
+  methods: {
+    registerUser: function registerUser() {
+      var _this = this;
 
-            axios.post('sign-up', this.user).then(function (response) {
-                _this.user = "";
-                _this.formErrors = "";
-                // vue-toasted
-                _this.$toasted.success(response.data, {
-                    theme: 'bubble',
-                    icon: {
-                        name: 'thumb_up',
-                        after: true
-                    },
-                    position: 'top-center',
-                    duration: 4000
-                });
-            }).catch(function (errors) {
-                _this.formErrors = errors.response.data.errors;
-            });
-        }
+      axios.post("sign-up", this.user).then(function (response) {
+        _this.user = "";
+        _this.formErrors = "";
+        // vue-toasted
+        _this.$toasted.success(response.data, {
+          theme: "bubble",
+          icon: {
+            name: "thumb_up",
+            after: true
+          },
+          position: "top-center",
+          duration: 4000
+        });
+      }).catch(function (errors) {
+        _this.formErrors = errors.response.data.errors;
+      });
     }
+  }
 });
 
 /***/ }),
@@ -48186,21 +48189,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        'select-photo': __WEBPACK_IMPORTED_MODULE_0__SelectPhoto_vue___default.a,
-        'display-photo': __WEBPACK_IMPORTED_MODULE_1__DisplayPhoto_vue___default.a
-    },
-    data: function data() {
-        return {
-            activeComponent: 'select-photo'
-        };
-    },
+  components: {
+    "select-photo": __WEBPACK_IMPORTED_MODULE_0__SelectPhoto_vue___default.a,
+    "display-photo": __WEBPACK_IMPORTED_MODULE_1__DisplayPhoto_vue___default.a
+  },
+  data: function data() {
+    return {
+      activeComponent: "select-photo"
+    };
+  },
 
-    methods: {
-        changeComponent: function changeComponent() {
-            this.activeComponent = 'display-photo';
-        }
+  methods: {
+    changeComponent: function changeComponent() {
+      this.activeComponent = "display-photo";
     }
+  }
 });
 
 /***/ }),
@@ -48280,37 +48283,35 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        'vue-loader': __WEBPACK_IMPORTED_MODULE_0__loader_VueLoader_vue___default.a
-    },
-    data: function data() {
-        return {
-            selectedPhoto: {},
-            isLoading: false
-        };
-    },
+  components: {
+    "vue-loader": __WEBPACK_IMPORTED_MODULE_0__loader_VueLoader_vue___default.a
+  },
+  data: function data() {
+    return {
+      selectedPhoto: null,
+      isLoading: false
+    };
+  },
 
-    methods: {
-        openFileDialog: function openFileDialog() {
-            this.$refs.selectPhoto.click();
-        },
-        onPhotoSelected: function onPhotoSelected() {
-            var _this = this;
+  methods: {
+    openFileDialog: function openFileDialog() {
+      this.$refs.selectPhoto.click();
+    },
+    onPhotoSelected: function onPhotoSelected() {
+      var _this = this;
 
-            this.selectedPhoto = this.$refs.selectPhoto.files[0];
-            this.isLoading = true;
-            this.$store.dispatch('getPhotoDetails', this.selectedPhoto).then(function (response) {
-                // console.log(response);
-                _this.isLoading = false;
-                _this.$emit('photoSelected');
-            });
-        }
+      this.selectedPhoto = this.$refs.selectPhoto.files[0];
+      this.isLoading = true;
+      this.$store.dispatch("getPhotoDetails", this.selectedPhoto).then(function (response) {
+        // console.log(response);
+        _this.isLoading = false;
+        _this.$emit("photoSelected");
+      });
     }
+  }
 });
 
 /***/ }),
@@ -48379,10 +48380,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // Import stylesheet
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['isLoading'],
-    components: {
-        Loading: __WEBPACK_IMPORTED_MODULE_0_vue_loading_overlay___default.a
-    }
+  props: ["isLoading"],
+  components: {
+    Loading: __WEBPACK_IMPORTED_MODULE_0_vue_loading_overlay___default.a
+  }
 });
 
 /***/ }),
@@ -48953,39 +48954,33 @@ var render = function() {
               )
             ]),
             _vm._v(" "),
-            _c("form", { attrs: { enctype: "multipart/form-data" } }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "show",
-                    rawName: "v-show",
-                    value: false,
-                    expression: "false"
-                  }
-                ],
-                ref: "selectPhoto",
-                attrs: { type: "file", name: "photo", accept: "image/*" },
-                on: { change: _vm.onPhotoSelected }
-              }),
-              _vm._v(" "),
-              _c(
-                "button",
+            _c("input", {
+              directives: [
                 {
-                  staticClass: "btn btn-info btn-raised mt-4",
-                  on: {
-                    click: function($event) {
-                      $event.preventDefault()
-                      return _vm.openFileDialog($event)
-                    }
+                  name: "show",
+                  rawName: "v-show",
+                  value: false,
+                  expression: "false"
+                }
+              ],
+              ref: "selectPhoto",
+              attrs: { type: "file", accept: "image/*" },
+              on: { change: _vm.onPhotoSelected }
+            }),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-info btn-raised mt-4",
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    return _vm.openFileDialog($event)
                   }
-                },
-                [
-                  _vm._v(
-                    "\n                        Add a photo\n                    "
-                  )
-                ]
-              )
-            ])
+                }
+              },
+              [_vm._v("\n                    Add a photo\n                ")]
+            )
           ]),
           _vm._v(" "),
           _c("vue-loader", { attrs: { isLoading: _vm.isLoading } })
@@ -49091,7 +49086,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.full-page-photo[data-v-039af310] {\n    position: relative;\n    background-size: cover;\n    background-position: center center;\n    background-repeat: no-repeat;\n    min-height: 100%;\n    width: 100%;\n}\n.full-page-photo.active[data-v-039af310] {\n    position: absolute;\n    z-index: 900;\n}\n.photo-overlay[data-v-039af310] {\n    position: absolute;\n    z-index: 0;\n    width: 100%;\n    height: 100%;\n    background-color: rgba(0, 0, 0, 0.5);\n    opacity: 0;\n}\n.active .photo-overlay[data-v-039af310] {\n    opacity: 1;\n}\n.add-details[data-v-039af310] {\n    position: relative;\n    left: 0;\n    right: 0;\n}\n\n", ""]);
+exports.push([module.i, "\n.full-page-photo[data-v-039af310] {\n  position: relative;\n  background-size: cover;\n  background-position: center center;\n  background-repeat: no-repeat;\n  min-height: 100%;\n  width: 100%;\n}\n.full-page-photo.active[data-v-039af310] {\n  position: absolute;\n  z-index: 900;\n}\n.photo-overlay[data-v-039af310] {\n  position: absolute;\n  z-index: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.5);\n  opacity: 0;\n}\n.active .photo-overlay[data-v-039af310] {\n  opacity: 1;\n}\n.add-details[data-v-039af310] {\n  position: relative;\n  left: 0;\n  right: 0;\n}\n", ""]);
 
 // exports
 
@@ -49115,24 +49110,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        'add-details': __WEBPACK_IMPORTED_MODULE_0__AddDetails_vue___default.a
-    },
-    data: function data() {
-        return {
-            hasPhoto: false
-        };
-    },
+  components: {
+    "add-details": __WEBPACK_IMPORTED_MODULE_0__AddDetails_vue___default.a
+  },
+  data: function data() {
+    return {
+      hasPhoto: false
+    };
+  },
 
-    computed: {
-        image: function image() {
-            return URL.createObjectURL(this.$store.state.selectedPhoto.photo);
-        }
-    },
-    mounted: function mounted() {
-        this.image;
-        this.hasPhoto = true;
+  computed: {
+    image: function image() {
+      return URL.createObjectURL(this.$store.state.selectedPhoto.photo);
     }
+  },
+  mounted: function mounted() {
+    this.image;
+    this.hasPhoto = true;
+  }
 });
 
 /***/ }),
@@ -49221,7 +49216,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.nav-pills .nav-item .nav-link[data-v-c185946e] {\n    padding: 3px 15px;\n    min-width: 70px;\n}\n.p-tab[data-v-c185946e] {\n    pointer-events: none;\n    cursor: default;\n}\n.no-margin[data-v-c185946e] {\n    margin: 0;\n}\n\n", ""]);
+exports.push([module.i, "\n.nav-pills .nav-item .nav-link[data-v-c185946e] {\n  padding: 3px 15px;\n  min-width: 70px;\n}\n.p-tab[data-v-c185946e] {\n  pointer-events: none;\n  cursor: default;\n}\n.no-margin[data-v-c185946e] {\n  margin: 0;\n}\n", ""]);
 
 // exports
 
@@ -49296,63 +49291,64 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        'exif': __WEBPACK_IMPORTED_MODULE_0__Exif_vue___default.a,
-        'story': __WEBPACK_IMPORTED_MODULE_1__Story_vue___default.a,
-        'tag': __WEBPACK_IMPORTED_MODULE_2__Tag_vue___default.a,
-        'gps': __WEBPACK_IMPORTED_MODULE_3__GPS_vue___default.a
-    },
-    data: function data() {
-        return {
-            currentTab: 1,
-            isLastTab: false,
-            components: ['exif', 'story', 'tag', 'gps'],
-            activeComponent: 'exif'
-        };
-    },
+  components: {
+    exif: __WEBPACK_IMPORTED_MODULE_0__Exif_vue___default.a,
+    story: __WEBPACK_IMPORTED_MODULE_1__Story_vue___default.a,
+    tag: __WEBPACK_IMPORTED_MODULE_2__Tag_vue___default.a,
+    gps: __WEBPACK_IMPORTED_MODULE_3__GPS_vue___default.a
+  },
+  data: function data() {
+    return {
+      currentTab: 1,
+      isLastTab: false,
+      components: ["exif", "story", "tag", "gps"],
+      activeComponent: "exif"
+    };
+  },
 
-    computed: {
-        photo: function photo() {
-            return this.$store.state.selectedPhoto.photo;
-        }
-    },
-    methods: {
-        showNextTab: function showNextTab() {
-            var tabs = document.getElementsByClassName('p-tab');
-            // could be used if submit button was not needed to show
-            // if (this.currentTab >= tabs.length) {
-            //     // return; // means do not execute code below it               
-            // }
-            if (this.currentTab == tabs.length - 1) {
-                this.isLastTab = true;
-            }
-            tabs[this.currentTab].click();
-            this.activeComponent = this.components[this.currentTab];
-            this.currentTab++;
-        },
-        uploadPhoto: function uploadPhoto() {
-            var _this = this;
-
-            this.$store.dispatch('mergeAllDetails').then(function (response) {
-                var formData = new FormData();
-                formData.append('photo', _this.photo);
-                formData.append('details', JSON.stringify(response));
-                axios.post('/photo/upload', formData).then(function (res) {
-                    _this.$toasted.success(res.data, {
-                        theme: 'bubble',
-                        icon: {
-                            name: 'thumb_up',
-                            after: true
-                        },
-                        position: 'top-center',
-                        duration: 4000
-                    });
-                }).catch(function (errors) {
-                    return console.log(errors.response.data);
-                });
-            });
-        }
+  computed: {
+    photo: function photo() {
+      return this.$store.state.selectedPhoto.photo;
     }
+  },
+  methods: {
+    showNextTab: function showNextTab() {
+      var tabs = document.getElementsByClassName("p-tab");
+      // could be used if submit button was not needed to show
+      // if (this.currentTab >= tabs.length) {
+      //     // return; // means do not execute code below it
+      // }
+      if (this.currentTab == tabs.length - 1) {
+        this.isLastTab = true;
+      }
+      tabs[this.currentTab].click();
+      this.activeComponent = this.components[this.currentTab];
+      this.currentTab++;
+    },
+    uploadPhoto: function uploadPhoto() {
+      var _this = this;
+
+      this.$store.dispatch("mergeAllDetails").then(function (response) {
+        var formData = new FormData();
+        formData.append("photo", _this.photo);
+        formData.append("details", JSON.stringify(response));
+        axios.post("/photo/upload", formData).then(function (res) {
+          window.location = res.data.redirect;
+          window.$toasted.success(res.data, {
+            theme: "bubble",
+            icon: {
+              name: "thumb_up",
+              after: true
+            },
+            position: "top-center",
+            duration: 4000
+          });
+        }).catch(function (errors) {
+          return console.log(errors.response.data);
+        });
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -49506,37 +49502,38 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            hasAllDetails: true,
-            isEditing: false
-        };
-    },
+  data: function data() {
+    return {
+      hasAllDetails: true,
+      isEditing: false
+    };
+  },
 
-    computed: {
-        photoDetails: {
-            get: function get() {
-                return this.$store.state.selectedPhoto.details;
-            },
-            set: function set() {
-                this.$store.state.selectedPhoto.details;
-            }
-        }
-    },
-    mounted: function mounted() {
-        for (var detail in this.photoDetails) {
-            if (this.photoDetails[detail] == "") {
-                this.hasAllDetails = false;
-                break;
-            }
-        }
-    },
-    beforeDestroy: function beforeDestroy() {
-        this.$store.dispatch('setUploadPhotoDetails', {
-            key: 'exif',
-            value: this.photoDetails
-        });
+  computed: {
+    photoDetails: {
+      get: function get() {
+        return this.$store.state.selectedPhoto.details;
+      },
+      set: function set() {
+        this.$store.state.selectedPhoto.details;
+      }
     }
+  },
+  mounted: function mounted() {
+    // check if the photos has got all the details
+    for (var detail in this.photoDetails) {
+      if (this.photoDetails[detail] == "") {
+        this.hasAllDetails = false;
+        break;
+      }
+    }
+  },
+  beforeDestroy: function beforeDestroy() {
+    this.$store.dispatch("setUploadPhotoDetails", {
+      key: "exif",
+      value: this.photoDetails
+    });
+  }
 });
 
 /***/ }),
@@ -49601,7 +49598,7 @@ var render = function() {
                   _vm._v(" "),
                   _vm.photoDetails.aperture
                     ? _c("span", { staticClass: "h5" }, [
-                        _vm._v("f/" + _vm._s(_vm.photoDetails.aperture))
+                        _vm._v(_vm._s(_vm.photoDetails.aperture))
                       ])
                     : _vm._e()
                 ])
@@ -49977,20 +49974,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            photo: {
-                title: '',
-                story: ''
-            }
-        };
-    },
-    beforeDestroy: function beforeDestroy() {
-        this.$store.dispatch('setUploadPhotoDetails', {
-            key: 'story',
-            value: this.photo
-        });
-    }
+  data: function data() {
+    return {
+      photo: {
+        title: "",
+        story: ""
+      }
+    };
+  },
+  beforeDestroy: function beforeDestroy() {
+    this.$store.dispatch("setUploadPhotoDetails", {
+      key: "story",
+      value: this.photo
+    });
+  }
 });
 
 /***/ }),
@@ -50163,44 +50160,44 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        'tags-input': __WEBPACK_IMPORTED_MODULE_0__voerro_vue_tagsinput__["a" /* default */]
-    },
-    data: function data() {
-        return {
-            tags: [],
-            allTags: {},
-            existingTags: {}
-        };
-    },
+  components: {
+    "tags-input": __WEBPACK_IMPORTED_MODULE_0__voerro_vue_tagsinput__["a" /* default */]
+  },
+  data: function data() {
+    return {
+      tags: [],
+      allTags: {},
+      existingTags: {}
+    };
+  },
 
-    computed: {
-        getAllTags: function getAllTags() {
-            var _this = this;
+  computed: {
+    getAllTags: function getAllTags() {
+      var _this = this;
 
-            axios.get('/tags').then(function (response) {
-                return _this.allTags = response.data.tags;
-            }).catch(function (errors) {
-                return console.log(errors.response.data);
-            });
-        },
-        populateTags: function populateTags() {
-            var _this2 = this;
+      axios.get("/tags").then(function (response) {
+        return _this.allTags = response.data.tags;
+      }).catch(function (errors) {
+        return console.log(errors.response.data);
+      });
+    },
+    populateTags: function populateTags() {
+      var _this2 = this;
 
-            this.allTags.forEach(function (tag) {
-                _this2.existingTags[tag.name] = tag.name;
-            });
-        }
-    },
-    mounted: function mounted() {
-        this.getAllTags;
-    },
-    beforeDestroy: function beforeDestroy() {
-        this.$store.dispatch('setUploadPhotoDetails', {
-            key: 'tags',
-            value: this.tags
-        });
+      this.allTags.forEach(function (tag) {
+        _this2.existingTags[tag.name] = tag.name;
+      });
     }
+  },
+  mounted: function mounted() {
+    this.getAllTags;
+  },
+  beforeDestroy: function beforeDestroy() {
+    this.$store.dispatch("setUploadPhotoDetails", {
+      key: "tags",
+      value: this.tags
+    });
+  }
 });
 
 /***/ }),
@@ -50970,17 +50967,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            photoLocation: ''
-        };
-    },
-    updated: function updated() {
-        this.$store.dispatch('setUploadPhotoDetails', {
-            key: 'location',
-            value: this.photoLocation
-        });
-    }
+  data: function data() {
+    return {
+      photoLocation: ""
+    };
+  },
+  updated: function updated() {
+    this.$store.dispatch("setUploadPhotoDetails", {
+      key: "location",
+      value: this.photoLocation
+    });
+  }
 });
 
 /***/ }),
@@ -51252,6 +51249,107 @@ if (false) {
 
 /***/ }),
 /* 134 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(0)
+/* script */
+var __vue_script__ = null
+/* template */
+var __vue_template__ = __webpack_require__(136)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/js/components/user/Profile.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-3cba5490", Component.options)
+  } else {
+    hotAPI.reload("data-v-3cba5490", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 135 */,
+/* 136 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _vm._m(0)
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "main main-raised" }, [
+      _c("div", { staticClass: "profile-content" }, [
+        _c("div", { staticClass: "container" }, [
+          _c("div", { staticClass: "row" }, [
+            _c("div", { staticClass: "col-md-6 mr-auto ml-auto" }, [
+              _c("div", { staticClass: "profile" }, [
+                _c("div", { staticClass: "avatar" }, [
+                  _c("img", {
+                    staticClass: "img-fluid rounded-circle img-raised",
+                    attrs: {
+                      src: "/images/profile_photo.jpg",
+                      alt: "Profile Photo"
+                    }
+                  })
+                ])
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "description text-center" }, [
+            _vm._v(
+              "\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis maiores fuga, ducimus natus porro magni excepturi quisquam esse dignissimos quidem accusantium. Ea tempore repudiandae asperiores minima aut voluptatibus libero nam.\n                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eum nostrum dignissimos aliquam odit omnis porro accusantium odio modi error. Quisquam, nobis. Error iusto iure odit! Incidunt quam nemo quaerat eveniet.\n                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet iste totam illo aliquid tempore reiciendis, veniam provident assumenda praesentium rerum accusamus? Repellendus modi quos et non animi doloremque dolorum error!\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum amet rem est et nostrum unde delectus repudiandae odit esse magni voluptas, dicta accusantium vel, voluptatem maiores eaque natus placeat. Esse?Am\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim quo ratione nobis maxime doloribus beatae odio sequi, asperiores voluptatibus sapiente dolores pariatur vero quis laudantium dolore ipsum. Error, nihil placeat.\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, quasi earum voluptatibus iusto quibusdam tempore ab eius vero minus impedit optio sunt numquam mollitia minima, rem quos debitis pariatur. Repellat.\n                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dicta reiciendis est eos, veritatis nulla eligendi ex optio aut modi libero sit magnam autem mollitia ipsa et, fuga excepturi aspernatur perferendis?\n                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum tenetur corrupti, voluptate ea natus porro corporis asperiores veniam tempore atque suscipit sint dignissimos fugiat laudantium recusandae quam similique laboriosam dolore.\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae temporibus distinctio est blanditiis aspernatur magni quia in incidunt, ducimus, optio velit totam iure tempora. Nostrum molestiae natus necessitatibus? Animi, sit?\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis odit totam, asperiores, sint deserunt harum voluptate accusamus odio, doloribus reiciendis saepe aspernatur exercitationem modi corrupti quibusdam architecto. Ea, exercitationem expedita!\n                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptas rem quam, alias quia quidem consectetur vitae officia obcaecati, fugit deserunt dignissimos velit nam nisi sit rerum ullam, sequi vel? Porro!\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam excepturi mollitia exercitationem dicta soluta deserunt beatae, facilis fugit sunt hic itaque dignissimos laboriosam nam voluptatum placeat quam sed temporibus delectus?\n                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Et officia autem ipsa, error velit non. Blanditiis ullam officiis eius, voluptas sit et animi itaque! Ea deserunt possimus ex facere beatae.\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure necessitatibus, sed dolores aut harum distinctio veniam repellendus libero saepe quos rerum unde pariatur similique officiis minima earum modi. Molestias, nisi?\n                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti asperiores, nulla ipsum minus ea placeat totam delectus incidunt veniam a dignissimos, sit unde adipisci eos eius molestias! Illum, similique voluptate?\n                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Qui veniam rerum incidunt facilis. Suscipit fugit autem amet quis asperiores consequatur. Sint enim beatae ad deleniti neque. Ea libero recusandae consectetur!\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Et, maxime. Delectus nesciunt ullam voluptatum sed ex quo quis, ducimus autem placeat perspiciatis laborum laudantium rerum odio, mollitia modi ad quod.\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi possimus consequuntur sit quae magnam doloribus tempore illo, consectetur iusto hic accusamus modi! Distinctio dolor, necessitatibus debitis ea at dolore minima.\n                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quasi fugit voluptate nisi culpa quia, in, numquam vitae autem nemo optio provident repudiandae vel voluptas reiciendis ad repellat saepe, deleniti commodi!\n                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Impedit quidem nihil perferendis illo harum, aliquam eius tempora cumque facilis at similique voluptas non quas nisi dolores sit sint ratione voluptatem?\n                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos possimus hic enim harum, laboriosam saepe sit. Quia minus unde deserunt minima, error fugit, perspiciatis quae quos beatae quaerat fugiat doloribus.\n            "
+            )
+          ])
+        ])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-3cba5490", module.exports)
+  }
+}
+
+/***/ }),
+/* 137 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

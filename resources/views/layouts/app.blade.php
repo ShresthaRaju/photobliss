@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html style="height: 100%">
-	<head>
-		@include('partials._header')
-	</head>
-	<body class="@yield('body_class')" style="height: 100%">
-		{{-- navigation bar --}}
-		@include('partials._navbar')
 
-		{{-- main content goes here --}}
-		<div id="app">
-			@yield('main_content')
-		</div>
+<head>
+    @include('partials._header')
+</head>
 
-		{{-- footer --}}
-		@include('partials._footer')
+<body class="@yield('body_class')" style="height: 100%">
+    {{-- navigation bar --}}
+    @include('partials._navbar') {{-- main content goes here --}}
+    <div id="app">
+        @yield('main_content')
+    </div>
 
-		{{-- scripts --}}
-		@include('partials._script')
-	</body>
+    {{-- footer --}}
+    @include('partials._footer') {{-- scripts --}}
+    @include('partials._script')
+</body>
+
 </html>

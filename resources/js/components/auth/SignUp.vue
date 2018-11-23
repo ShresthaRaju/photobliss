@@ -65,40 +65,40 @@
     </div>
 </template>
 <script>
-    export default {
-        data() {
-            return {
-                user: {
-                    fullName: '',
-                    email: '',
-                    username: '',
-                    password: ''
-                },
-                formErrors: {}
-            }
-        },
-        methods: {
-            registerUser() {
-                axios.post('sign-up', this.user)
-                    .then(response => {
-                        this.user = "";
-                        this.formErrors = "";
-                        // vue-toasted
-                        this.$toasted.success(response.data, {
-                            theme: 'bubble',
-                            icon: {
-                                name: 'thumb_up',
-                                after: true
-                            },
-                            position: 'top-center',
-                            duration: 4000
-                        });
-                    })
-                    .catch(errors => {
-                        this.formErrors = errors.response.data.errors;
-                    })
+export default {
+  data() {
+    return {
+      user: {
+        fullName: "",
+        email: "",
+        username: "",
+        password: ""
+      },
+      formErrors: {}
+    };
+  },
+  methods: {
+    registerUser() {
+      axios
+        .post("sign-up", this.user)
+        .then(response => {
+          this.user = "";
+          this.formErrors = "";
+          // vue-toasted
+          this.$toasted.success(response.data, {
+            theme: "bubble",
+            icon: {
+              name: "thumb_up",
+              after: true
             },
-        },
+            position: "top-center",
+            duration: 4000
+          });
+        })
+        .catch(errors => {
+          this.formErrors = errors.response.data.errors;
+        });
     }
-
+  }
+};
 </script>

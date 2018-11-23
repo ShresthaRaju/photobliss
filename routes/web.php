@@ -28,6 +28,11 @@ Route::group(['prefix' => 'photo', 'as' => 'photo.'], function () {
     Route::post('upload', ['as' => 'upload', 'uses' => 'PhotosController@uploadPhoto']);
 });
 
+// users
+Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
+    Route::get('@{username}', ['as' => 'profile', 'uses' => 'UsersController@showProfile']);
+});
+
 //tags
 Route::get('tags', 'TagsController@getAllTags');
 

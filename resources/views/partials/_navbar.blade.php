@@ -1,7 +1,6 @@
 <nav class="navbar fixed-top navbar-expand-lg navbar-transparent bg-dark navbar-color-on-scroll" color-on-scroll="300" style="z-index: 800;">
     <div class="container">
-        {{-- when a user is not authenticated --}}
-        @guest
+        {{-- when a user is not authenticated --}} @guest
         <a class="navbar-brand font-weight-bold" href="{{ route('welcome') }}">
             PhotoBliss
         </a>
@@ -12,8 +11,7 @@
                 </a>
             </li>
         </ul>
-        @else
-        {{-- when a user is authenticated --}}
+        @else {{-- when a user is authenticated --}}
         <div class="navbar-translate">
             <a class="navbar-brand font-weight-bold" href="{{ route('welcome') }}">
                 PhotoBliss
@@ -55,7 +53,7 @@
                             </i>
                             Submit a photo
                         </a>
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="{{route('users.profile',[Auth::user()->username])}}">
                             <i class="material-icons">
                                 person
                             </i>

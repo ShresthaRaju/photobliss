@@ -52,22 +52,22 @@ class PhotosController extends Controller
         $photo_details = json_decode($request->details);
 
         if ($request->hasFile('photo')) {
-            $photoFile  = $request->file('photo');
-            $photo_name = time() . '_' . $photoFile->getClientOriginalName();
+            $photoFile = $request->file('photo');
+            $photo_name = time() . '_' . Auth::user()->username . '_' . $photoFile->getClientOriginalName();
 
-            // persist the photo details to database
-            $photo                = new Photo();
-            $photo->photo_name    = $photo_name;
-            $photo->title         = $photo_details->title;
-            $photo->story         = $photo_details->story;
-            $photo->make          = $photo_details->make;
-            $photo->model         = $photo_details->model;
-            $photo->aperture      = $photo_details->aperture;
+            // persist the photo details into database
+            $photo = new Photo();
+            $photo->photo_name = $photo_name;
+            $photo->title = $photo_details->title;
+            $photo->story = $photo_details->story;
+            $photo->make = $photo_details->make;
+            $photo->model = $photo_details->model;
+            $photo->aperture = $photo_details->aperture;
             $photo->exposure_time = $photo_details->exposure_time;
-            $photo->focal_length  = $photo_details->focal_length;
-            $photo->iso           = $photo_details->iso;
-            $photo->location      = $photo_details->location;
-            $photo->user_id       = Auth::id();
+            $photo->focal_length = $photo_details->focal_length;
+            $photo->iso = $photo_details->iso;
+            $photo->location = $photo_details->location;
+            $photo->user_id = Auth::id();
 
             if ($photo->save()) {
                 foreach ($photo_details->tags as $pTag) {
@@ -84,7 +84,7 @@ class PhotosController extends Controller
                     $this->move_photo($photoFile, $photo_name, Auth::user()->username);
                 }
 
-                return response()->json("Upload Successful");
+                return response()->json(['redirect' => route('users.profile', [Auth::user()->username])]);
             }
         }
     }
@@ -144,10 +144,9 @@ class PhotosController extends Controller
     public function getPhotoDetails(Request $request)
     {
         if ($request->hasFile('selected_photo')) {
-
-            $photo      = $request->file('selected_photo');
+            $photo = $request->file('selected_photo');
             $photo_name = $photo->getClientOriginalName();
-            $exif       = exif_read_data($photo);
+            $exif = exif_read_data($photo);
 
             // checks if the key exists in the given array
             if (Arr::exists($exif, 'FocalLength')) {
@@ -156,21 +155,23 @@ class PhotosController extends Controller
                 $focal_length = "";
             }
 
-            if (Arr::exists($exif, 'FNumber')) {
-                $aperture = $this->convert($exif['FNumber']);
-            } else {
-                $aperture = "";
+            if (Arr::exists($exif, 'COMPUTED')) {
+                if (Arr::exists($exif['COMPUTED'], 'ApertureFNumber')) {
+                    $aperture = $exif['COMPUTED']['ApertureFNumber'];
+                } else {
+                    $aperture = "";
+                }
             }
 
-            $photo_details['name']          = $photo_name;
-            $photo_details['width']         = $exif['COMPUTED']['Width'];
-            $photo_details['height']        = $exif['COMPUTED']['Height'];
-            $photo_details['make']          = Arr::exists($exif, 'Make') ? $exif['Make'] : '';
-            $photo_details['model']         = Arr::exists($exif, 'Model') ? $exif['Model'] : '';
-            $photo_details['focal_length']  = $focal_length;
-            $photo_details['aperture']      = $aperture;
+            $photo_details['name'] = $photo_name;
+            $photo_details['width'] = $exif['COMPUTED']['Width'];
+            $photo_details['height'] = $exif['COMPUTED']['Height'];
+            $photo_details['make'] = Arr::exists($exif, 'Make') ? $exif['Make'] : '';
+            $photo_details['model'] = Arr::exists($exif, 'Model') ? $exif['Model'] : '';
+            $photo_details['focal_length'] = $focal_length;
+            $photo_details['aperture'] = $aperture;
             $photo_details['exposure_time'] = Arr::exists($exif, 'ExposureTime') ? $exif['ExposureTime'] : '';
-            $photo_details['iso']           = Arr::exists($exif, 'ISOSpeedRatings') ? $exif['ISOSpeedRatings'] : '';
+            $photo_details['iso'] = Arr::exists($exif, 'ISOSpeedRatings') ? $exif['ISOSpeedRatings'] : '';
 
             return response()->json($photo_details);
         }
@@ -185,7 +186,7 @@ class PhotosController extends Controller
 
     public function det()
     {
-        $exif = exif_read_data(public_path('images/autumn.jpg'));
-        dd(Arr::exists($exif, 'FocalLength'));
+        $exif = exif_read_data(public_path('images/frog.jpg'));
+        dd($exif);
     }
 }

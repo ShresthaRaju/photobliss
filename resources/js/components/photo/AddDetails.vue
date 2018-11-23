@@ -49,81 +49,81 @@
     </div>
 </template>
 <script>
-    import Exif from './Exif.vue';
-    import Story from './Story.vue';
-    import Tag from './Tag.vue';
-    import GPS from './GPS.vue';
-    export default {
-        components: {
-            'exif': Exif,
-            'story': Story,
-            'tag': Tag,
-            'gps': GPS,
-        },
-        data() {
-            return {
-                currentTab: 1,
-                isLastTab: false,
-                components: ['exif', 'story', 'tag', 'gps'],
-                activeComponent: 'exif',
-            }
-        },
-        computed: {
-            photo() {
-                return this.$store.state.selectedPhoto.photo;
-            }
-        },
-        methods: {
-            showNextTab() {
-                var tabs = document.getElementsByClassName('p-tab');
-                // could be used if submit button was not needed to show
-                // if (this.currentTab >= tabs.length) {
-                //     // return; // means do not execute code below it               
-                // }
-                if (this.currentTab == tabs.length - 1) {
-                    this.isLastTab = true;
-                }
-                tabs[this.currentTab].click();
-                this.activeComponent = this.components[this.currentTab];
-                this.currentTab++;
-            },
-            uploadPhoto() {
-                this.$store.dispatch('mergeAllDetails').then(response => {
-                    var formData = new FormData();
-                    formData.append('photo', this.photo);
-                    formData.append('details', JSON.stringify(response));
-                    axios.post('/photo/upload', formData)
-                        .then(res => {
-                            this.$toasted.success(res.data, {
-                                theme: 'bubble',
-                                icon: {
-                                    name: 'thumb_up',
-                                    after: true
-                                },
-                                position: 'top-center',
-                                duration: 4000
-                            });
-                        })
-                        .catch(errors => console.log(errors.response.data))
-                });
-            }
-        },
+import Exif from "./Exif.vue";
+import Story from "./Story.vue";
+import Tag from "./Tag.vue";
+import GPS from "./GPS.vue";
+export default {
+  components: {
+    exif: Exif,
+    story: Story,
+    tag: Tag,
+    gps: GPS
+  },
+  data() {
+    return {
+      currentTab: 1,
+      isLastTab: false,
+      components: ["exif", "story", "tag", "gps"],
+      activeComponent: "exif"
+    };
+  },
+  computed: {
+    photo() {
+      return this.$store.state.selectedPhoto.photo;
     }
-
+  },
+  methods: {
+    showNextTab() {
+      var tabs = document.getElementsByClassName("p-tab");
+      // could be used if submit button was not needed to show
+      // if (this.currentTab >= tabs.length) {
+      //     // return; // means do not execute code below it
+      // }
+      if (this.currentTab == tabs.length - 1) {
+        this.isLastTab = true;
+      }
+      tabs[this.currentTab].click();
+      this.activeComponent = this.components[this.currentTab];
+      this.currentTab++;
+    },
+    uploadPhoto() {
+      this.$store.dispatch("mergeAllDetails").then(response => {
+        var formData = new FormData();
+        formData.append("photo", this.photo);
+        formData.append("details", JSON.stringify(response));
+        axios
+          .post("/photo/upload", formData)
+          .then(res => {
+            window.location = res.data.redirect;
+            window.$toasted.success(res.data, {
+              theme: "bubble",
+              icon: {
+                name: "thumb_up",
+                after: true
+              },
+              position: "top-center",
+              duration: 4000
+            });
+          })
+          .catch(errors => console.log(errors.response.data));
+      });
+    }
+  }
+};
 </script>
 <style scoped>
-    .nav-pills .nav-item .nav-link {
-        padding: 3px 15px;
-        min-width: 70px;
-    }
+.nav-pills .nav-item .nav-link {
+  padding: 3px 15px;
+  min-width: 70px;
+}
 
-    .p-tab {
-        pointer-events: none;
-        cursor: default;
-    }
+.p-tab {
+  pointer-events: none;
+  cursor: default;
+}
 
-    .no-margin {
-        margin: 0;
-    }
-
+.no-margin {
+  margin: 0;
+}
 </style>

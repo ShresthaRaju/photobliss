@@ -27,6 +27,16 @@ class User extends Authenticatable
         'password', 'remember_token', 'active', 'created_at', 'updated_at', 'email_verfied_at',
     ];
 
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'username';
+    }
+
     public function photos()
     {
         return $this->hasMany(Models\Photo::class);

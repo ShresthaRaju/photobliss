@@ -48,36 +48,35 @@
     </div>
 </template>
 <script>
-    export default {
-        data() {
-            return {
-                user: {
-                    email: '',
-                    password: ''
-                },
-                errors: {},
-            }
-        },
-        methods: {
-            signIn() {
-                var vm = this;
-                axios.post('sign-in', this.user)
-                    .then(response => {
-                        if (response.data.authenticated) {
-                            location.reload();
-                            this.user = "";
-                            this.errors = "";
-                        } else {
-                            this.errors = {
-                                invalidLogin: "Invalid Login! Please try again"
-                            }
-                        }
-                    })
-                    .catch(errors => {
-                        this.errors = errors.response.data.errors
-                    })
-            }
-        }
+export default {
+  data() {
+    return {
+      user: {
+        email: "",
+        password: ""
+      },
+      errors: {}
+    };
+  },
+  methods: {
+    signIn() {
+      axios
+        .post("sign-in", this.user)
+        .then(response => {
+          if (response.data.authenticated) {
+            location.reload();
+            this.user = "";
+            this.errors = "";
+          } else {
+            this.errors = {
+              invalidLogin: "Invalid Login! Please try again"
+            };
+          }
+        })
+        .catch(errors => {
+          this.errors = errors.response.data.errors;
+        });
     }
-
+  }
+};
 </script>
